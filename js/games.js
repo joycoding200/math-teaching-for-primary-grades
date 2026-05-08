@@ -16,7 +16,7 @@ GAMES.pattern = {
   },
   stage2: function(container){
     var pool=QUESTION_BANK.pattern;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.ptAns=p.ans; gameState.ptExplain=p.explain;
     var h='<div style="display:flex;gap:8px;font-size:30px;justify-content:center;flex-wrap:wrap">';
     p.seq.forEach(function(s){ h+='<span style="background:#f8f9fa;padding:8px 12px;border-radius:12px">'+s+'</span>'; });
@@ -31,7 +31,7 @@ GAMES.pattern = {
       fb.textContent='✅ 正确！'+gameState.ptExplain; fb.className='feedback ok';
       el.classList.add('selected'); setStars('pattern',2); celebrate(); updateStarTotal();
     }else{
-      fb.textContent='❌ 再观察一下规律吧'; fb.className='feedback err';
+      fb.textContent='❌ 再观察一下规律吧'; fb.className='feedback err';awardResult(currentGame,false,0);
       el.classList.add('wrong'); setTimeout(function(){ el.classList.remove('wrong'); },500);
     }
   },
@@ -61,10 +61,10 @@ GAMES.countshape = {
   },
   stage2: function(container){
     var pool=QUESTION_BANK.countshape;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.csAns=p.ans;
     container.innerHTML=
-      '<p style="font-weight:700;text-align:center;font-size:16px">'+p.q+'</p>'+
+      '<p style="font-weight:700;text-align:center;font-size:16px">'+applyThemeText(p.q)+'</p>'+
       (p.hint?'<p style="font-size:13px;color:#adb5bd">提示：'+p.hint+'</p>':'')+
       '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="csAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.countshape.check()">确认 ✓</button></div>'+
       '<p class="feedback" id="csfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
@@ -72,8 +72,8 @@ GAMES.countshape = {
   check: function(){
     var ans=parseInt(document.getElementById('csAns').value),fb=document.getElementById('csfb');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.csAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('countshape',2);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 再仔细数数';fb.className='feedback err';}
+    if(ans===gameState.csAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('countshape',2);celebrate();updateStarTotal();awardExplore(currentGame);}
+    else{fb.textContent='❌ 再仔细数数';fb.className='feedback err';awardResult(currentGame,false,0);}
   },
   stage3: function(container){ GAMES.countshape.stage2(container); }
 };
@@ -127,24 +127,24 @@ GAMES.balance = {
     document.getElementById('blCount').textContent='已移动: '+gameState.blMoved+' 个';
     if(gameState.blA===gameState.blB){
       var fb=document.getElementById('blfb');
-      if(gameState.blMoved===gameState.blAns){fb.textContent='✅ 完美！正好移动了'+gameState.blMoved+'个';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal();}
+      if(gameState.blMoved===gameState.blAns){fb.textContent='✅ 完美！正好移动了'+gameState.blMoved+'个';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
       else{fb.textContent='✅ 两边相等了！但可以移得更少（最优：'+gameState.blAns+'个）';fb.className='feedback ok';}
     }
   },
   stage3: function(container){
     var pool=QUESTION_BANK.balance;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.blAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>移动</span><input class="answer-input" id="blAns"><span>个</span><button class="btn btn-p" onclick="GAMES.balance.check3()">确认</button></div>'+
       '<p class="feedback" id="blfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('blAns').value),fb=document.getElementById('blfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.blAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 移动数=(多出的)÷2';fb.className='feedback err';}
+    if(ans===gameState.blAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 移动数=(多出的)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -193,8 +193,8 @@ GAMES.simplelogic = {
       var correct=true;
       all.forEach(function(a){ if(gameState.slPuzzle.ans[a.dataset.person]!==a.dataset.item) correct=false; });
       var fb=document.getElementById('slfb');
-      if(correct){fb.textContent='✅ 推理正确！太棒了！';fb.className='feedback ok';setStars('simplelogic',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 有些不对哦，再想想线索';fb.className='feedback err';}
+      if(correct){fb.textContent='✅ 推理正确！太棒了！';fb.className='feedback ok';setStars('simplelogic',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 有些不对哦，再想想线索';fb.className='feedback err';awardResult(currentGame,false,0);}
     }
   },
   stage3: function(container){ GAMES.simplelogic.stage2(container); }
@@ -237,23 +237,23 @@ GAMES.queue = {
   check2: function(){
     var ans=parseInt(document.getElementById('qAns').value),fb=document.getElementById('qfb');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.qAns2){fb.textContent='✅ 正确！'+gameState.qFromLeft+'+'+gameState.qFromRight+'-1='+gameState.qAns2;fb.className='feedback ok';setStars('queue',2);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 公式：左数+右数-1';fb.className='feedback err';}
+    if(ans===gameState.qAns2){fb.textContent='✅ 正确！'+gameState.qFromLeft+'+'+gameState.qFromRight+'-1='+gameState.qAns2;fb.className='feedback ok';setStars('queue',2);celebrate();updateStarTotal();awardExplore(currentGame);}
+    else{fb.textContent='❌ 公式：左数+右数-1';fb.className='feedback err';awardResult(currentGame,false,0);}
   },
   stage3: function(container){
     var pool=QUESTION_BANK.queue;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.qAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="qAns3"><button class="btn btn-p" onclick="GAMES.queue.check3()">确认</button></div>'+
       '<p class="feedback" id="qfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('qAns3').value),fb=document.getElementById('qfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.qAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('queue',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 再想想公式：左数+右数-1';fb.className='feedback err';}
+    if(ans===gameState.qAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('queue',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 再想想公式：左数+右数-1';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -298,19 +298,19 @@ GAMES.summulti = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.summulti;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     var parts=p.ans.toString().split(',');
     gameState.smAnsA=parseInt(parts[0]);gameState.smAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>小数=</span><input class="answer-input" id="smB"><span>大数=</span><input class="answer-input" id="smA"><button class="btn btn-p" onclick="GAMES.summulti.check3()">确认</button></div>'+
       '<p class="feedback" id="smfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var a=parseInt(document.getElementById('smA').value),b=parseInt(document.getElementById('smB').value),fb=document.getElementById('smfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.smAnsA&&b===gameState.smAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('summulti',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 小数=和÷(倍数+1)';fb.className='feedback err';}
+    if(a===gameState.smAnsA&&b===gameState.smAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('summulti',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 小数=和÷(倍数+1)';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -352,19 +352,19 @@ GAMES.diffmulti = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.diffmulti;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     var parts=p.ans.toString().split(',');
     gameState.dmAnsA=parseInt(parts[0]);gameState.dmAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>小数=</span><input class="answer-input" id="dmB"><span>大数=</span><input class="answer-input" id="dmA"><button class="btn btn-p" onclick="GAMES.diffmulti.check3()">确认</button></div>'+
       '<p class="feedback" id="dmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var a=parseInt(document.getElementById('dmA').value),b=parseInt(document.getElementById('dmB').value),fb=document.getElementById('dmfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.dmAnsA&&b===gameState.dmAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('diffmulti',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 小数=差÷(倍数-1)';fb.className='feedback err';}
+    if(a===gameState.dmAnsA&&b===gameState.dmAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('diffmulti',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 小数=差÷(倍数-1)';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -413,7 +413,7 @@ GAMES.age = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.age;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     if(p.ans.toString().indexOf(',')>-1){
       var parts=p.ans.toString().split(',');
       gameState.ageAnsD=parseInt(parts[0]);gameState.ageAnsK=parseInt(parts[1]);
@@ -422,9 +422,9 @@ GAMES.age = {
       gameState.ageAns3=p.ans;
       gameState.ageMode='one';
     }
-    gameState.ageQ=p.q;gameState.ageHint=p.hint;
+    gameState.ageQ=applyThemeText(p.q);gameState.ageHint=p.hint;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       (gameState.ageMode==='two'?
       '<div class="answer-row"><span>小明</span><input class="answer-input" id="ageK"><span>岁</span><span>爸爸</span><input class="answer-input" id="ageD"><span>岁</span><button class="btn btn-p" onclick="GAMES.age.check3()">确认</button></div>':
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="ageAns"><button class="btn btn-p" onclick="GAMES.age.check3()">确认</button></div>')+
@@ -435,13 +435,13 @@ GAMES.age = {
     if(gameState.ageMode==='two'){
       var k=parseInt(document.getElementById('ageK').value),d=parseInt(document.getElementById('ageD').value);
       if(isNaN(k)||isNaN(d)){fb.textContent='请填写完整';return}
-      if(k===gameState.ageAnsK&&d===gameState.ageAnsD){fb.textContent='✅ 全对！年龄差不变，用差倍公式';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 年龄差不变，用差倍公式';fb.className='feedback err';}
+      if(k===gameState.ageAnsK&&d===gameState.ageAnsD){fb.textContent='✅ 全对！年龄差不变，用差倍公式';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 年龄差不变，用差倍公式';fb.className='feedback err';awardResult(currentGame,false,0);}
     }else{
       var ans=parseInt(document.getElementById('ageAns').value);
       if(isNaN(ans)){fb.textContent='请输入数字';return}
-      if(ans===gameState.ageAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 年龄差不变，找对倍数关系';fb.className='feedback err';}
+      if(ans===gameState.ageAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 年龄差不变，找对倍数关系';fb.className='feedback err';awardResult(currentGame,false,0);}
     }
   }
 };
@@ -485,18 +485,18 @@ GAMES.profitloss = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.profitloss;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.plAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>人数=</span><input class="answer-input" id="plAns3"><button class="btn btn-p" onclick="GAMES.profitloss.check3()">确认</button></div>'+
       '<p class="feedback" id="plfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('plAns3').value),fb=document.getElementById('plfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.plAns3){fb.textContent='✅ 正确！人数=(盈+亏)÷分法差';fb.className='feedback ok';setStars('profitloss',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 公式：(盈+亏)÷(分法之差)';fb.className='feedback err';}
+    if(ans===gameState.plAns3){fb.textContent='✅ 正确！人数=(盈+亏)÷分法差';fb.className='feedback ok';setStars('profitloss',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 公式：(盈+亏)÷(分法之差)';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -543,24 +543,24 @@ GAMES.reverse = {
     else if(op==='div'&&gameState.rvStep===1){gameState.rvCur/=val;gameState.rvStep++;fb.innerHTML='当前值: <b>'+gameState.rvCur+'</b>（÷'+val+'后）';btns.children[1].disabled=true;}
     else if(op==='sub'&&gameState.rvStep===2){gameState.rvCur-=val;gameState.rvStep++;fb.innerHTML='当前值: <b>'+gameState.rvCur+'</b>（-'+val+'后）';btns.children[2].disabled=true;}
     if(gameState.rvStep===3){
-      if(gameState.rvCur===gameState.rvX){fb.innerHTML='🎉 还原成功！原来的数是 <b style="color:#ff6b6b;font-size:20px">'+gameState.rvX+'</b>';fb.className='feedback ok';setStars('reverse',2);celebrate();updateStarTotal();}
-      else{fb.innerHTML='❌ 结果不对，你再检查一下步骤顺序';fb.className='feedback err';}
+      if(gameState.rvCur===gameState.rvX){fb.innerHTML='🎉 还原成功！原来的数是 <b style="color:#ff6b6b;font-size:20px">'+gameState.rvX+'</b>';fb.className='feedback ok';setStars('reverse',2);celebrate();updateStarTotal();awardExplore(currentGame);}
+      else{fb.innerHTML='❌ 结果不对，你再检查一下步骤顺序';fb.className='feedback err';awardResult(currentGame,false,0);}
     }
   },
   stage3: function(container){
     var pool=QUESTION_BANK.reverse;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.rvAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>原来的数=</span><input class="answer-input" id="rvAns3"><button class="btn btn-p" onclick="GAMES.reverse.check3()">确认</button></div>'+
       '<p class="feedback" id="rvfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('rvAns3').value),fb=document.getElementById('rvfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.rvAns3){fb.textContent='✅ 正确！从结果倒推还原';fb.className='feedback ok';setStars('reverse',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 从结果倒推：运算相反，顺序倒过来';fb.className='feedback err';}
+    if(ans===gameState.rvAns3){fb.textContent='✅ 正确！从结果倒推还原';fb.className='feedback ok';setStars('reverse',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 从结果倒推：运算相反，顺序倒过来';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -609,18 +609,18 @@ GAMES.average = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.average;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.avAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="avAns3"><button class="btn btn-p" onclick="GAMES.average.check3()">确认</button></div>'+
       '<p class="feedback" id="avfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseFloat(document.getElementById('avAns3').value),fb=document.getElementById('avfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.avAns3)<0.1){fb.textContent='✅ 正确！平均='+gameState.avAns3;fb.className='feedback ok';setStars('average',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ (总和)÷个数';fb.className='feedback err';}
+    if(Math.abs(ans-gameState.avAns3)<0.1){fb.textContent='✅ 正确！平均='+gameState.avAns3;fb.className='feedback ok';setStars('average',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ (总和)÷个数';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -688,24 +688,24 @@ GAMES.chickenrabbit = {
     if(gameState.crCurLegs===gameState.crLegs){
       var fb=document.getElementById('crfb');
       fb.textContent='🎉 腿数对了！鸡='+gameState.crCurChickens+'只，兔='+gameState.crCurRabbits+'只';
-      fb.className='feedback ok';setStars('chickenrabbit',2);celebrate();updateStarTotal();
+      fb.className='feedback ok';setStars('chickenrabbit',2);celebrate();updateStarTotal();awardExplore(currentGame);
     }
   },
   stage3: function(container){
     var pool=QUESTION_BANK.chickenrabbit;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     var parts=p.ans.toString().split(',');
     gameState.crAnsC=parseInt(parts[0]);gameState.crAnsR=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>🐔鸡</span><input class="answer-input" id="crAC"><span>只</span><span>🐰兔</span><input class="answer-input" id="crAR"><span>只</span><button class="btn btn-p" onclick="GAMES.chickenrabbit.check3()">确认</button></div>'+
       '<p class="feedback" id="crfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var c=parseInt(document.getElementById('crAC').value),r=parseInt(document.getElementById('crAR').value),fb=document.getElementById('crfb3');
     if(isNaN(c)||isNaN(r)){fb.textContent='请填写完整';return}
-    if(c===gameState.crAnsC&&r===gameState.crAnsR){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('chickenrabbit',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 用假设法：先假设全是鸡，再替换';fb.className='feedback err';}
+    if(c===gameState.crAnsC&&r===gameState.crAnsR){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('chickenrabbit',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 用假设法：先假设全是鸡，再替换';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -746,8 +746,8 @@ GAMES.venn = {
   check3: function(){
     var ans=parseInt(document.getElementById('vnAns').value),fb=document.getElementById('vnfb');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.vnUnion){fb.textContent='✅ 正确！A+B-都='+gameState.vnA+'+'+gameState.vnB+'-'+gameState.vnBoth+'='+gameState.vnUnion;fb.className='feedback ok';setStars('venn',2);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 公式：A+B-都喜欢';fb.className='feedback err';}
+    if(ans===gameState.vnUnion){fb.textContent='✅ 正确！A+B-都='+gameState.vnA+'+'+gameState.vnB+'-'+gameState.vnBoth+'='+gameState.vnUnion;fb.className='feedback ok';setStars('venn',2);celebrate();updateStarTotal();awardExplore(currentGame);}
+    else{fb.textContent='❌ 公式：A+B-都喜欢';fb.className='feedback err';awardResult(currentGame,false,0);}
   },
   stage3: function(container){ GAMES.venn.stage2(container); }
 };
@@ -795,22 +795,22 @@ GAMES.pigeonhole = {
     if(gameState.phRemaining<=0)return;
     gameState.phInBoxes[i]++;gameState.phRemaining--;
     GAMES.pigeonhole.renderPH();
-    if(gameState.phRemaining===0){setStars('pigeonhole',2);celebrate();updateStarTotal();}
+    if(gameState.phRemaining===0){setStars('pigeonhole',2);celebrate();updateStarTotal();awardExplore(currentGame);}
   },
   stage3: function(container){
     var pool=QUESTION_BANK.pigeonhole;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.phAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>不少于</span><input class="answer-input" id="phAns3"><span>个</span><button class="btn btn-p" onclick="GAMES.pigeonhole.check3()">确认</button></div>'+
       '<p class="feedback" id="phfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('phAns3').value),fb=document.getElementById('phfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.phAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('pigeonhole',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 考虑最坏情况：平均分配后向上取整';fb.className='feedback err';}
+    if(ans===gameState.phAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('pigeonhole',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 考虑最坏情况：平均分配后向上取整';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -846,7 +846,7 @@ GAMES.logic = {
     el.style.borderColor='#4ecdc4';el.style.background='#f0fffc';
     var who=el.dataset.who,fb=document.getElementById('lgfb'),pz=gameState.lgPuzzle;
     fb.textContent='想想看：如果'+who+'是小偷（在说谎），其他人的话是否自洽？';
-    if(who===pz.culprit){fb.textContent='✅ 正确！'+who+'就是小偷！';fb.className='feedback ok';setStars('logic',2);celebrate();updateStarTotal();}
+    if(who===pz.culprit){fb.textContent='✅ 正确！'+who+'就是小偷！';fb.className='feedback ok';setStars('logic',2);celebrate();updateStarTotal();awardExplore(currentGame);}
   },
   stage3: function(container){ GAMES.logic.stage2(container); }
 };
@@ -897,18 +897,18 @@ GAMES.meeting = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.meeting;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.mtAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>相遇时间=</span><input class="answer-input" id="mtAns3"><span>分钟/小时</span><button class="btn btn-p" onclick="GAMES.meeting.check3()">确认</button></div>'+
       '<p class="feedback" id="mtfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseFloat(document.getElementById('mtAns3').value),fb=document.getElementById('mtfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.mtAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度和';fb.className='feedback ok';setStars('meeting',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 公式：距离÷(速度A+速度B)';fb.className='feedback err';}
+    if(Math.abs(ans-gameState.mtAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度和';fb.className='feedback ok';setStars('meeting',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 公式：距离÷(速度A+速度B)';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -955,18 +955,18 @@ GAMES.chase = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.chase;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.chAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>追及时间=</span><input class="answer-input" id="chAns3"><span>分钟/小时</span><button class="btn btn-p" onclick="GAMES.chase.check3()">确认</button></div>'+
       '<p class="feedback" id="chfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseFloat(document.getElementById('chAns3').value),fb=document.getElementById('chfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.chAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度差';fb.className='feedback ok';setStars('chase',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 公式：领先距离÷(快-慢)';fb.className='feedback err';}
+    if(Math.abs(ans-gameState.chAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度差';fb.className='feedback ok';setStars('chase',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 公式：领先距离÷(快-慢)';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -1016,10 +1016,10 @@ GAMES.work = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.work;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.wkAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="wkAns3"><span>天</span><button class="btn btn-p" onclick="GAMES.work.check3()">确认</button></div>'+
       '<p class="feedback" id="wkfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1027,11 +1027,11 @@ GAMES.work = {
     var ans=parseFloat(document.getElementById('wkAns3').value),fb=document.getElementById('wkfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
     if(typeof gameState.wkAns3==='number'){
-      if(Math.abs(ans-gameState.wkAns3)<0.15){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';}
+      if(Math.abs(ans-gameState.wkAns3)<0.15){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';awardResult(currentGame,false,0);}
     }else{
-      if(String(ans)===String(gameState.wkAns3)){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';}
+      if(String(ans)===String(gameState.wkAns3)){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';awardResult(currentGame,false,0);}
     }
   }
 };
@@ -1082,19 +1082,19 @@ GAMES.boatcurrent = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.boatcurrent;
-    var p=pool[Math.floor(Math.random()*pool.length)];
-    gameState.bcQ=p.q;
+    var p=pickAdaptiveQuestion(currentGame,pool);
+    gameState.bcQ=applyThemeText(p.q);
     if(p.ans.toString().indexOf(',')>-1){
       var parts=p.ans.toString().split(',');
       gameState.bcAns1=parts[0];gameState.bcAns2=parts[1];gameState.bcMode='two';
       container.innerHTML=
-        '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+        '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
         '<div class="answer-row"><input class="answer-input" id="bcAns1" placeholder="顺水速度"><input class="answer-input" id="bcAns2" placeholder="逆水速度"><button class="btn btn-p" onclick="GAMES.boatcurrent.check3()">确认</button></div>'+
         '<p class="feedback" id="bcfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
     }else{
       gameState.bcAns1=p.ans;gameState.bcMode='one';
       container.innerHTML=
-        '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+        '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
         '<div class="answer-row"><input class="answer-input" id="bcAns1" placeholder="答案"><button class="btn btn-p" onclick="GAMES.boatcurrent.check3()">确认</button></div>'+
         '<p class="feedback" id="bcfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
     }
@@ -1104,13 +1104,13 @@ GAMES.boatcurrent = {
     if(gameState.bcMode==='two'){
       var a1=document.getElementById('bcAns1').value,a2=document.getElementById('bcAns2').value;
       if(!a1||!a2){fb.textContent='请填写完整';return}
-      if(a1===gameState.bcAns1&&a2===gameState.bcAns2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 顺水=v+c，逆水=v-c（或船速=(顺+逆)÷2）';fb.className='feedback err';}
+      if(a1===gameState.bcAns1&&a2===gameState.bcAns2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 顺水=v+c，逆水=v-c（或船速=(顺+逆)÷2）';fb.className='feedback err';awardResult(currentGame,false,0);}
     }else{
       var ans=parseFloat(document.getElementById('bcAns1').value);
       if(isNaN(ans)){fb.textContent='请输入数字';return}
-      if(Math.abs(ans-parseFloat(gameState.bcAns1))<0.2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();}
-      else{fb.textContent='❌ 再算算：顺水=v+c，逆水=v-c';fb.className='feedback err';}
+      if(Math.abs(ans-parseFloat(gameState.bcAns1))<0.2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+      else{fb.textContent='❌ 再算算：顺水=v+c，逆水=v-c';fb.className='feedback err';awardResult(currentGame,false,0);}
     }
   }
 };
@@ -1178,18 +1178,18 @@ GAMES.cowgrass = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.cowgrass;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.cgAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>需要</span><input class="answer-input" id="cgAns3"><span>天</span><button class="btn btn-p" onclick="GAMES.cowgrass.check3()">确认</button></div>'+
       '<p class="feedback" id="cgfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseFloat(document.getElementById('cgAns3').value),fb=document.getElementById('cgfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.cgAns3)<0.15){fb.textContent='✅ 正确！先求每天长草量和原有草量';fb.className='feedback ok';setStars('cowgrass',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 先算每天长草量=(N₁T₁-N₂T₂)÷(T₁-T₂)，再算原有草量';fb.className='feedback err';}
+    if(Math.abs(ans-gameState.cgAns3)<0.15){fb.textContent='✅ 正确！先求每天长草量和原有草量';fb.className='feedback ok';setStars('cowgrass',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 先算每天长草量=(N₁T₁-N₂T₂)÷(T₁-T₂)，再算原有草量';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -1240,24 +1240,24 @@ GAMES.substitution = {
       if(gameState.applesLeft===0){
         fb.textContent='🎉 太棒了！3个苹果全换成了6个香蕉！所以 1🍍 = 6🍌';
         fb.style.color='#00b894';
-        setStars('substitution',2);celebrate();updateStarTotal();
+        setStars('substitution',2);celebrate();updateStarTotal();awardExplore(currentGame);
       }
     },300);
   },
   stage3: function(container){
     var pool=QUESTION_BANK.substitution;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.subAns=p.ans;
     container.innerHTML=
-      '<p style="font-size:16px;font-weight:600;text-align:center">'+p.q+'</p>'+
+      '<p style="font-size:16px;font-weight:600;text-align:center">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="subAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.substitution.check()">确认 ✓</button></div>'+
       '<p class="feedback" id="subfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check: function(){
     var ans=parseInt(document.getElementById('subAns').value),fb=document.getElementById('subfb');
     if(isNaN(ans)){fb.textContent='请输入数字哦～';return}
-    if(ans===gameState.subAns){fb.textContent='✅ 太棒了！';fb.className='feedback ok';setStars('substitution',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 再想想哦～';fb.className='feedback err';}
+    if(ans===gameState.subAns){fb.textContent='✅ 太棒了！';fb.className='feedback ok';setStars('substitution',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 再想想哦～';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -1292,10 +1292,10 @@ GAMES.cycle = {
     var fb=document.getElementById('cyfb');
     if(ch===gameState.cyAns){
       fb.textContent='✅ 正确！'+gameState.cyPos+'÷'+gameState.cyLen+'='+Math.floor(gameState.cyPos/gameState.cyLen)+'...'+((gameState.cyPos%gameState.cyLen)||gameState.cyLen);
-      fb.className='feedback ok';el.classList.add('selected');setStars('cycle',2);celebrate();updateStarTotal();
+      fb.className='feedback ok';el.classList.add('selected');setStars('cycle',2);celebrate();updateStarTotal();awardExplore(currentGame);
     }else{
       fb.textContent='❌ 用除法算算：'+gameState.cyPos+'÷'+gameState.cyLen+'=?';
-      fb.className='feedback err';el.classList.add('wrong');setTimeout(function(){el.classList.remove('wrong');},500);
+      fb.className='feedback err';awardResult(currentGame,false,0);el.classList.add('wrong');setTimeout(function(){el.classList.remove('wrong');},500);
     }
   },
   stage3: function(container){ GAMES.cycle.stage2(container); }
@@ -1358,18 +1358,18 @@ GAMES.tree = {
   setMode: function(m){gameState.trMode=m;GAMES.tree.renderTR();},
   stage3: function(container){
     var pool=QUESTION_BANK.tree;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.trAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="trAns3"><button class="btn btn-p" onclick="GAMES.tree.check3()">确认</button></div>'+
       '<p class="feedback" id="trfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var ans=parseInt(document.getElementById('trAns3').value),fb=document.getElementById('trfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.trAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('tree',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 先算段数，再根据种植方式确定树数';fb.className='feedback err';}
+    if(ans===gameState.trAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('tree',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 先算段数，再根据种植方式确定树数';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -1410,18 +1410,18 @@ GAMES.normalization = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.normalization;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.nmAns=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><input class="answer-input" id="nmAns" placeholder="?"><button class="btn btn-p" onclick="GAMES.normalization.check()">确认</button></div>'+
       '<p class="feedback" id="nmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check: function(){
     var ans=parseInt(document.getElementById('nmAns').value),fb=document.getElementById('nmfb');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.nmAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('normalization',3);celebrate();updateStarTotal();}
-    else{fb.textContent='❌ 先求1份的量（归一），再求多份';fb.className='feedback err';}
+    if(ans===gameState.nmAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('normalization',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else{fb.textContent='❌ 先求1份的量（归一），再求多份';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };
 
@@ -1464,20 +1464,20 @@ GAMES.sumdiff = {
   },
   stage3: function(container){
     var pool=QUESTION_BANK.sumdiff;
-    var p=pool[Math.floor(Math.random()*pool.length)];
+    var p=pickAdaptiveQuestion(currentGame,pool);
     var parts=p.ans.toString().split(',');
     gameState.sdAnsA=parseInt(parts[0]);gameState.sdAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
       '<div class="answer-row"><span>大数=</span><input class="answer-input" id="sdA"><span>小数=</span><input class="answer-input" id="sdB"><button class="btn btn-p" onclick="GAMES.sumdiff.check3()">确认</button></div>'+
       '<p class="feedback" id="sdfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   check3: function(){
     var a=parseInt(document.getElementById('sdA').value),b=parseInt(document.getElementById('sdB').value),fb=document.getElementById('sdfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.sdAnsA&&b===gameState.sdAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('sumdiff',3);celebrate();updateStarTotal();}
-    else if(a===gameState.sdAnsA){fb.textContent='大数对了！小数=(和-差)÷2';fb.className='feedback err';}
-    else if(b===gameState.sdAnsB){fb.textContent='小数对了！大数=(和+差)÷2';fb.className='feedback err';}
-    else{fb.textContent='再想想公式：(和±差)÷2';fb.className='feedback err';}
+    if(a===gameState.sdAnsA&&b===gameState.sdAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('sumdiff',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
+    else if(a===gameState.sdAnsA){fb.textContent='大数对了！小数=(和-差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
+    else if(b===gameState.sdAnsB){fb.textContent='小数对了！大数=(和+差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
+    else{fb.textContent='再想想公式：(和±差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
   }
 };

@@ -11,7 +11,12 @@
 <div class="topbar" id="topbar">
   <button class="back-btn" id="backBtn" onclick="goMenu()">←</button>
   <h1 id="topTitle">🧮 数学思维小课堂</h1>
-  <span class="stars-total" id="starTotal">⭐ 0</span>
+  <div class="top-stats" id="topStats">
+    <span class="stat-item" id="scoreDisplay" title="总积分">🏆 0</span>
+    <span class="stat-item" id="streakDisplay" title="连胜">🔥 0</span>
+    <span class="stat-item stars-total" id="starTotal" title="已获星数">⭐ 0</span>
+    <span class="stat-item theme-btn" id="themeToggle" title="切换主题" onclick="toggleTheme()" style="display:none">🎨</span>
+  </div>
 </div>
 
 <div class="container" id="container">

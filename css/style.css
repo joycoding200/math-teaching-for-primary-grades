@@ -25,6 +25,10 @@ body{
 }
 .topbar .back-btn.show{display:flex}
 .topbar .stars-total{font-size:14px;opacity:.9}
+.topbar .top-stats{display:flex;gap:12px;align-items:center}
+.topbar .stat-item{font-size:13px;opacity:.9;color:#fff;cursor:default}
+.topbar .stat-item.theme-btn{cursor:pointer;opacity:.7;font-size:18px}
+.topbar .stat-item.theme-btn:hover{opacity:1}
 
 /* ====== Main Container ====== */
 .container{max-width:960px;margin:0 auto;padding:16px}
@@ -144,6 +148,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
 /* ====== Celebration ====== */
 .cele{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
 .cele .confetti{position:absolute;animation:fall 1.6s ease-out forwards}
+
+/* ====== Achievement Popup ====== */
+.achieve-popup{
+  position:fixed;top:80px;right:20px;background:#fff;border-radius:16px;padding:14px 20px;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:300;display:flex;align-items:center;gap:12px;
+  animation:slideInRight .4s cubic-bezier(.34,1.56,.64,1),fadeOut .3s 2.5s forwards;
+  max-width:280px;border:2px solid #feca57;
+}
+.achieve-icon{font-size:36px}
+@keyframes slideInRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(30px)}}
+
+/* ====== Timer Bar ====== */
+.timer-wrap{
+  width:100%;max-width:400px;display:flex;align-items:center;gap:10px;padding:6px 0;
+}
+.timer-bar-track{flex:1;height:8px;background:#f1f3f5;border-radius:8px;overflow:hidden}
+.timer-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#4ecdc4,#00b894);transition:width .3s}
+.timer-bar-fill.warn{background:linear-gradient(90deg,#feca57,#ff9f43)}
+.timer-bar-fill.urgent{background:linear-gradient(90deg,#ff6b6b,#ee5a24);animation:pulse .5s infinite}
+.timer-text{font-size:14px;font-weight:700;min-width:36px;text-align:center}
+.timer-text.urgent{color:#ff6b6b}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ====== Hint System ====== */
+.hint-row{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:4px}
+.hint-btn{font-size:12px;padding:4px 10px;border-radius:10px;border:1px dashed #dee2e6;background:#f8f9fa;cursor:pointer;color:#868e96;transition:all .2s}
+.hint-btn:hover{border-color:var(--c3);color:#f59f00;background:#fff8e1}
+.hint-btn.used{opacity:.4;pointer-events:none}
+.hint-content{font-size:13px;color:#495057;background:#fff8e1;padding:6px 12px;border-radius:8px;margin-top:4px;text-align:center;animation:fadeIn .3s}
+
+/* ====== Difficulty Badge ====== */
+.diff-badge{padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.diff-badge.easy{background:#d3f9d8;color:#2b8a3e}
+.diff-badge.medium{background:#fff3bf;color:#e67700}
+.diff-badge.hard{background:#ffe3e3;color:#c92a2a}
 
 /* ====== Trees on path ====== */
 .tree-row{display:flex;gap:0;align-items:center;flex-wrap:wrap;justify-content:center}
