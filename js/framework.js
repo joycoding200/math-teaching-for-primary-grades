@@ -107,6 +107,16 @@ function addScore(gameId, points){
 function awardResult(gameId, isCorrect, hintsUsed, timedPerfect){
   var s=loadStats();
   hintsUsed=hintsUsed||getHintsUsed();
+  // 计时模式下自动追踪完美通关：连续答对 5 题触发
+  if(timedMode && timerInterval){
+    if(!gameState._timedStreak) gameState._timedStreak=0;
+    if(isCorrect){
+      gameState._timedStreak++;
+      if(gameState._timedStreak>=5){ timedPerfect=true; gameState._timedStreak=0; }
+    }else{
+      gameState._timedStreak=0;
+    }
+  }
   if(isCorrect){
     s.totalCorrect++; s.streak++; s.maxStreak=Math.max(s.maxStreak,s.streak);
     var bonus=Math.min(s.streak*SCORE_CONFIG.streakBonus, SCORE_CONFIG.maxStreakBonus);
