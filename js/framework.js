@@ -211,7 +211,7 @@ var THEMES = [
   },
   {id:'pirate',  icon:'🏴‍☠️', name:'海盗寻宝', desc:'在七海中破解数学谜题',
    css:{'--c1':'#e8590c','--c2':'#0ca678','--bg':'#fff4e6','--topbar-gradient':'linear-gradient(135deg,#d9480f,#e8590c)'},
-   map:{'小明':'水手小明','小红':'水手小红','小华':'瞭望手小华','小朋友':'小海盗','老师':'船长','爸爸':'大副爸爸','妈妈':'航海长妈妈','爷爷':'老船长','哥哥':'炮手哥哥','弟弟':'见习海盗弟弟','姐姐':'领航员姐姐','妹妹':'见习海盗妹妹','苹果':'椰子','香蕉':'菠萝','橘子':'芒果','糖果':'金币巧克力','铅笔':'匕首','笔记本':'藏宝图','巧克力':'朗姆酒糖','卡片':'悬赏令','书':'航海日志','本子':'航海笔记','笔':'羽毛笔','元':'金币','分':'铜板','角':'银币','公里':'海里','千米':'海里','米':'码','厘米':'寸','小时':'海时','分钟':'海分','秒':'海秒','天':'日落','岁':'个潮汐季','条':'根','个':'枚','只':'头','棵树':'椰子树','花':'珊瑚','旗':'海盗旗','树苗':'椰苗','跑步':'甲板奔跑','跳远':'跳帮','游泳':'潜泳','骑车':'骑海豚','开车':'驾船','篮球队':'弯刀队','足球队':'火炮队','汽车':'小船','摩托车':'快艇','船':'海盗船','飞机':'信天翁','火车':'海列车','高铁':'飓风号','兔子':'海岛兔','乌龟':'巨龟','鸡':'鹦鹉','兔':'洞穴兔','牛':'海牛','河':'洋流','路':'航线','池塘':'环礁湖','花坛':'珊瑚礁','跑道':'甲板','走廊':'船舷通道','抽屉':'宝箱','箱子':'木箱','盒子':'宝盒','邮筒':'信瓶','房间':'船舱','宿舍':'水手舱','书架':'藏宝架','一班':'弯刀队','二班':'火炮队','红队':'红胡子队','蓝队':'蓝鲸队','A箱':'A宝箱','B箱':'B宝箱'}
+   map:{'小明':'水手小明','小红':'水手小红','小华':'瞭望手小华','小朋友':'小海盗','老师':'船长','爸爸':'大副爸爸','妈妈':'航海长妈妈','爷爷':'老船长','哥哥':'炮手哥哥','弟弟':'见习海盗弟弟','姐姐':'领航员姐姐','妹妹':'见习海盗妹妹','苹果':'椰子','香蕉':'菠萝','橘子':'芒果','糖果':'金币巧克力','铅笔':'匕首','笔记本':'藏宝图','巧克力':'朗姆酒糖','卡片':'悬赏令','书':'航海日志','本子':'航海笔记','笔':'羽毛笔','元':'金币','分':'铜板','角':'银币','公里':'海里','千米':'海里','米':'码','厘米':'寸','小时':'海时','分钟':'海分','秒':'海秒','天':'日落','岁':'潮汐季','条':'根','个':'枚','只':'头','棵树':'椰子树','花':'珊瑚','旗':'海盗旗','树苗':'椰苗','跑步':'甲板奔跑','跳远':'跳帮','游泳':'潜泳','骑车':'骑海豚','开车':'驾船','篮球队':'弯刀队','足球队':'火炮队','汽车':'小船','摩托车':'快艇','船':'海盗船','飞机':'信天翁','火车':'海列车','高铁':'飓风号','兔子':'海岛兔','乌龟':'巨龟','鸡':'鹦鹉','兔':'洞穴兔','牛':'海牛','河':'洋流','路':'航线','池塘':'环礁湖','花坛':'珊瑚礁','跑道':'甲板','走廊':'船舷通道','抽屉':'宝箱','箱子':'木箱','盒子':'宝盒','邮筒':'信瓶','房间':'船舱','宿舍':'水手舱','书架':'藏宝架','一班':'弯刀队','二班':'火炮队','红队':'红胡子队','蓝队':'蓝鲸队','A箱':'A宝箱','B箱':'B宝箱'}
   },
   {id:'kitchen', icon:'🧑‍🍳', name:'美食厨房', desc:'用食谱和食材学数学',
    css:{'--c1':'#e64980','--c2':'#20c997','--bg':'#fff0f6','--topbar-gradient':'linear-gradient(135deg,#c2255c,#e64980)'},
@@ -340,7 +340,7 @@ function switchStage(stage){
   renderGameStage();
 }
 
-var timedMode=false;
+var timedMode=true;
 
 function renderGameStage(){
   if(!currentGame) return;
@@ -367,11 +367,7 @@ function injectStage3Extras(container){
     '<label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none">'+
     '<input type="checkbox" id="timedToggle" '+(timedMode?'checked':'')+' onchange="toggleTimedMode(this.checked)"> ⏱ 计时挑战</label>'+
     '<span id="timerBadge" style="display:'+(timedMode?'inline':'none')+'" class="diff-badge '+diff+'">'+({easy:'120s',medium:'75s',hard:'45s'})[diff]+'</span>'+
-    '<button class="hint-btn" id="hintBtn1" onclick="showStageHint(1)">💡 提示1</button>'+
-    '<button class="hint-btn" id="hintBtn2" onclick="showStageHint(2)" style="display:none">💡 提示2</button>'+
-    '<button class="hint-btn" id="hintBtn3" onclick="showStageHint(3)" style="display:none">💡 答案</button>'+
     '</div>'+
-    '<div class="hint-content" id="hintContent" style="display:none"></div>'+
     '<span style="font-size:12px;color:#adb5bd" id="timerBest"></span>'+
     '</div>'+
     '<div class="timer-wrap" id="timerWrap" style="display:'+(timedMode?'flex':'none')+'">'+
@@ -547,23 +543,13 @@ function updateTimerBest(){
   if(el) el.textContent=best>0?' | 已完成 '+best+' 次':'';
 }
 
-// ── 庆祝动画 ──
+// ── 庆祝动画：大拇指 + "你真棒！" ──
 function celebrate(){
-  var c=document.getElementById('cele');
-  var cols=['#ff6b6b','#feca57','#4ecdc4','#a29bfe','#fd79a8','#00b894','#ffd93d','#6c5ce7'];
-  for(var i=0;i<50;i++){
-    var el=document.createElement('div'); el.className='confetti';
-    el.style.left=Math.random()*100+'%';
-    el.style.top=-(Math.random()*40)+'px';
-    el.style.background=cols[Math.floor(Math.random()*cols.length)];
-    el.style.animationDelay=Math.random()*.5+'s';
-    el.style.animationDuration=(1+Math.random()*1.5)+'s';
-    el.style.borderRadius=Math.random()>.5?'50%':'3px';
-    el.style.width=(6+Math.random()*10)+'px';
-    el.style.height=(6+Math.random()*10)+'px';
-    c.appendChild(el);
-    setTimeout(function(){el.remove();},2000);
-  }
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;text-align:center;pointer-events:none;animation:celePopIn .4s cubic-bezier(.34,1.56,.64,1),celeFadeOut .4s 1.2s forwards';
+  overlay.innerHTML='<div style="font-size:80px;animation:celeBounce .4s cubic-bezier(.34,1.56,.64,1)">👍</div><div style="font-size:28px;font-weight:900;color:#ff6b6b;margin-top:4px;text-shadow:0 2px 8px rgba(255,107,107,.3)">你真棒！</div>';
+  document.body.appendChild(overlay);
+  setTimeout(function(){overlay.remove();},1700);
 }
 
 // ── 共享工具函数 ──
