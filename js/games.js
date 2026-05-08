@@ -10,7 +10,7 @@ GAMES.pattern = {
       '<div class="explain-box">'+
       '<div class="step"><span class="step-num">1</span>观察前4个图形的排列：🔴 🔵 🔴 🔵</div>'+
       '<div class="step"><span class="step-num">2</span>发现规律：<span class="highlight">红蓝交替出现</span>，每个位置颜色固定</div>'+
-      '<div class="step"><span class="step-num">3</span>第5个（奇数位）应该和第1、3个一样 → <span class="highlight">🔵</span></div>'+
+      '<div class="step"><span class="step-num">3</span>第5个（奇数位）应该和第1、3个一样 → <span class="highlight">🔴</span></div>'+
       '</div>'+
       '<div class="formula-box">📌 找规律口诀：<b>一看颜色，二看形状，三看数量，四看方向</b></div>';
   },
