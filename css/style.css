@@ -31,8 +31,6 @@ body{
 .topbar .stars-total{font-size:14px;opacity:.9}
 .topbar .top-stats{display:flex;gap:14px;align-items:center}
 .topbar .stat-item{font-size:13px;opacity:.9;color:#fff;cursor:default}
-.topbar .stat-item.theme-btn{cursor:pointer;opacity:.7;font-size:20px;transition:all .2s}
-.topbar .stat-item.theme-btn:hover{opacity:1;transform:scale(1.15)}
 
 /* ====== Main Container ====== */
 .container{max-width:960px;margin:0 auto;padding:20px}

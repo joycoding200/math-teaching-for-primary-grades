@@ -64,7 +64,7 @@ GAMES.countshape = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.csAns=p.ans;
     container.innerHTML=
-      '<p style="font-weight:700;text-align:center;font-size:16px">'+applyThemeText(p.q)+'</p>'+
+      '<p style="font-weight:700;text-align:center;font-size:16px">'+p.q+'</p>'+
       (p.hint?'<p style="font-size:13px;color:#adb5bd">提示：'+p.hint+'</p>':'')+
       '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="csAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.countshape.check()">确认 ✓</button></div>'+
       '<p class="feedback" id="csfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
@@ -136,7 +136,7 @@ GAMES.balance = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.blAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>移动</span><input class="answer-input" id="blAns"><span>个</span><button class="btn btn-p" onclick="GAMES.balance.check3()">确认</button></div>'+
       '<p class="feedback" id="blfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -245,7 +245,7 @@ GAMES.queue = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.qAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="qAns3"><button class="btn btn-p" onclick="GAMES.queue.check3()">确认</button></div>'+
       '<p class="feedback" id="qfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -302,7 +302,7 @@ GAMES.summulti = {
     var parts=p.ans.toString().split(',');
     gameState.smAnsA=parseInt(parts[0]);gameState.smAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>小数=</span><input class="answer-input" id="smB"><span>大数=</span><input class="answer-input" id="smA"><button class="btn btn-p" onclick="GAMES.summulti.check3()">确认</button></div>'+
       '<p class="feedback" id="smfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -356,7 +356,7 @@ GAMES.diffmulti = {
     var parts=p.ans.toString().split(',');
     gameState.dmAnsA=parseInt(parts[0]);gameState.dmAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>小数=</span><input class="answer-input" id="dmB"><span>大数=</span><input class="answer-input" id="dmA"><button class="btn btn-p" onclick="GAMES.diffmulti.check3()">确认</button></div>'+
       '<p class="feedback" id="dmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -422,9 +422,9 @@ GAMES.age = {
       gameState.ageAns3=p.ans;
       gameState.ageMode='one';
     }
-    gameState.ageQ=applyThemeText(p.q);gameState.ageHint=p.hint;
+    gameState.ageQ=p.q;gameState.ageHint=p.hint;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       (gameState.ageMode==='two'?
       '<div class="answer-row"><span>小明</span><input class="answer-input" id="ageK"><span>岁</span><span>爸爸</span><input class="answer-input" id="ageD"><span>岁</span><button class="btn btn-p" onclick="GAMES.age.check3()">确认</button></div>':
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="ageAns"><button class="btn btn-p" onclick="GAMES.age.check3()">确认</button></div>')+
@@ -488,7 +488,7 @@ GAMES.profitloss = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.plAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>人数=</span><input class="answer-input" id="plAns3"><button class="btn btn-p" onclick="GAMES.profitloss.check3()">确认</button></div>'+
       '<p class="feedback" id="plfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -552,7 +552,7 @@ GAMES.reverse = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.rvAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>原来的数=</span><input class="answer-input" id="rvAns3"><button class="btn btn-p" onclick="GAMES.reverse.check3()">确认</button></div>'+
       '<p class="feedback" id="rvfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -612,7 +612,7 @@ GAMES.average = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.avAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="avAns3"><button class="btn btn-p" onclick="GAMES.average.check3()">确认</button></div>'+
       '<p class="feedback" id="avfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -697,7 +697,7 @@ GAMES.chickenrabbit = {
     var parts=p.ans.toString().split(',');
     gameState.crAnsC=parseInt(parts[0]);gameState.crAnsR=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>🐔鸡</span><input class="answer-input" id="crAC"><span>只</span><span>🐰兔</span><input class="answer-input" id="crAR"><span>只</span><button class="btn btn-p" onclick="GAMES.chickenrabbit.check3()">确认</button></div>'+
       '<p class="feedback" id="crfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -802,7 +802,7 @@ GAMES.pigeonhole = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.phAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>不少于</span><input class="answer-input" id="phAns3"><span>个</span><button class="btn btn-p" onclick="GAMES.pigeonhole.check3()">确认</button></div>'+
       '<p class="feedback" id="phfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -900,7 +900,7 @@ GAMES.meeting = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.mtAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>相遇时间=</span><input class="answer-input" id="mtAns3"><span>分钟/小时</span><button class="btn btn-p" onclick="GAMES.meeting.check3()">确认</button></div>'+
       '<p class="feedback" id="mtfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -958,7 +958,7 @@ GAMES.chase = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.chAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>追及时间=</span><input class="answer-input" id="chAns3"><span>分钟/小时</span><button class="btn btn-p" onclick="GAMES.chase.check3()">确认</button></div>'+
       '<p class="feedback" id="chfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1019,7 +1019,7 @@ GAMES.work = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.wkAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="wkAns3"><span>天</span><button class="btn btn-p" onclick="GAMES.work.check3()">确认</button></div>'+
       '<p class="feedback" id="wkfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1083,18 +1083,18 @@ GAMES.boatcurrent = {
   stage3: function(container){
     var pool=QUESTION_BANK.boatcurrent;
     var p=pickAdaptiveQuestion(currentGame,pool);
-    gameState.bcQ=applyThemeText(p.q);
+    gameState.bcQ=p.q;
     if(p.ans.toString().indexOf(',')>-1){
       var parts=p.ans.toString().split(',');
       gameState.bcAns1=parts[0];gameState.bcAns2=parts[1];gameState.bcMode='two';
       container.innerHTML=
-        '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+        '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
         '<div class="answer-row"><input class="answer-input" id="bcAns1" placeholder="顺水速度"><input class="answer-input" id="bcAns2" placeholder="逆水速度"><button class="btn btn-p" onclick="GAMES.boatcurrent.check3()">确认</button></div>'+
         '<p class="feedback" id="bcfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
     }else{
       gameState.bcAns1=p.ans;gameState.bcMode='one';
       container.innerHTML=
-        '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+        '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
         '<div class="answer-row"><input class="answer-input" id="bcAns1" placeholder="答案"><button class="btn btn-p" onclick="GAMES.boatcurrent.check3()">确认</button></div>'+
         '<p class="feedback" id="bcfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
     }
@@ -1181,7 +1181,7 @@ GAMES.cowgrass = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.cgAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>需要</span><input class="answer-input" id="cgAns3"><span>天</span><button class="btn btn-p" onclick="GAMES.cowgrass.check3()">确认</button></div>'+
       '<p class="feedback" id="cgfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1249,7 +1249,7 @@ GAMES.substitution = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.subAns=p.ans;
     container.innerHTML=
-      '<p style="font-size:16px;font-weight:600;text-align:center">'+applyThemeText(p.q)+'</p>'+
+      '<p style="font-size:16px;font-weight:600;text-align:center">'+p.q+'</p>'+
       '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="subAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.substitution.check()">确认 ✓</button></div>'+
       '<p class="feedback" id="subfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1361,7 +1361,7 @@ GAMES.tree = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.trAns3=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>答案：</span><input class="answer-input" id="trAns3"><button class="btn btn-p" onclick="GAMES.tree.check3()">确认</button></div>'+
       '<p class="feedback" id="trfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1413,7 +1413,7 @@ GAMES.normalization = {
     var p=pickAdaptiveQuestion(currentGame,pool);
     gameState.nmAns=p.ans;
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><input class="answer-input" id="nmAns" placeholder="?"><button class="btn btn-p" onclick="GAMES.normalization.check()">确认</button></div>'+
       '<p class="feedback" id="nmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
@@ -1468,7 +1468,7 @@ GAMES.sumdiff = {
     var parts=p.ans.toString().split(',');
     gameState.sdAnsA=parseInt(parts[0]);gameState.sdAnsB=parseInt(parts[1]);
     container.innerHTML=
-      '<p style="text-align:center;font-weight:700">'+applyThemeText(p.q)+'</p>'+
+      '<p style="text-align:center;font-weight:700">'+p.q+'</p>'+
       '<div class="answer-row"><span>大数=</span><input class="answer-input" id="sdA"><span>小数=</span><input class="answer-input" id="sdB"><button class="btn btn-p" onclick="GAMES.sumdiff.check3()">确认</button></div>'+
       '<p class="feedback" id="sdfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },

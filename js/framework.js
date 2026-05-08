@@ -199,80 +199,6 @@ function getDifficultyTime(difficulty){
   return difficulty==='hard'?45:difficulty==='medium'?75:120;
 }
 
-// ═══════════════════════════════════════════
-//  ── 故事化主题引擎 ──
-// ═══════════════════════════════════════════
-
-var THEMES = [
-  {id:'default', icon:'📚', name:'经典课堂', desc:'原汁原味的数学题'},
-  {id:'space',   icon:'🚀', name:'太空探险', desc:'在宇宙中探索数学奥秘',
-   css:{'--c1':'#845ef7','--c2':'#339af0','--bg':'#f3f0ff','--topbar-gradient':'linear-gradient(135deg,#5f3dc4,#7950f2)'},
-   map:{'小明':'宇航员小明','小红':'宇航员小红','小华':'导航员小华','小朋友':'小小宇航员','老师':'舰长','爸爸':'指挥官爸爸','妈妈':'科学家妈妈','爷爷':'老舰长','哥哥':'大副哥哥','弟弟':'学员弟弟','姐姐':'中尉姐姐','妹妹':'学员妹妹','苹果':'能量块','香蕉':'燃料棒','橘子':'氧气罐','糖果':'口粮','铅笔':'激光笔','笔记本':'数据板','巧克力':'压缩饼干','卡片':'通行证','书':'操作手册','本子':'任务日志','笔':'触控笔','元':'星际币','分':'星分','角':'星角','公里':'光秒','千米':'光秒','米':'星米','厘米':'星厘','小时':'星际时','分钟':'星际分','秒':'星际秒','天':'火星日','岁':'星际年','条':'根','个':'枚','只':'台','棵树':'信号塔','花':'指示灯','旗':'信号旗','树苗':'微型塔','跑步':'太空漫步','跳远':'低重力跳跃','游泳':'太空游泳','骑车':'驾驶月球车','开车':'驾驶飞船','篮球队':'陨石队','足球队':'星云队','汽车':'探测车','摩托车':'悬浮摩托','船':'星际飞船','飞机':'太空战机','火车':'星际列车','高铁':'超光速列车','兔子':'外星兔','乌龟':'陨石龟','鸡':'太空鸡','兔':'月球兔','牛':'银河牛','河':'星云流','路':'航道','池塘':'陨石坑','花坛':'太空花园','跑道':'发射轨道','走廊':'舰桥通道','抽屉':'货舱','箱子':'集装箱','盒子':'储存舱','邮筒':'通讯站','房间':'舱室','宿舍':'船员舱','书架':'资料架','一班':'α小队','二班':'β小队','红队':'火星队','蓝队':'海王星队','A箱':'A货舱','B箱':'B货舱'}
-  },
-  {id:'pirate',  icon:'🏴‍☠️', name:'海盗寻宝', desc:'在七海中破解数学谜题',
-   css:{'--c1':'#e8590c','--c2':'#0ca678','--bg':'#fff4e6','--topbar-gradient':'linear-gradient(135deg,#d9480f,#e8590c)'},
-   map:{'小明':'水手小明','小红':'水手小红','小华':'瞭望手小华','小朋友':'小海盗','老师':'船长','爸爸':'大副爸爸','妈妈':'航海长妈妈','爷爷':'老船长','哥哥':'炮手哥哥','弟弟':'见习海盗弟弟','姐姐':'领航员姐姐','妹妹':'见习海盗妹妹','苹果':'椰子','香蕉':'菠萝','橘子':'芒果','糖果':'金币巧克力','铅笔':'匕首','笔记本':'藏宝图','巧克力':'朗姆酒糖','卡片':'悬赏令','书':'航海日志','本子':'航海笔记','笔':'羽毛笔','元':'金币','分':'铜板','角':'银币','公里':'海里','千米':'海里','米':'码','厘米':'寸','小时':'海时','分钟':'海分','秒':'海秒','天':'日落','岁':'潮汐季','条':'根','个':'枚','只':'头','棵树':'椰子树','花':'珊瑚','旗':'海盗旗','树苗':'椰苗','跑步':'甲板奔跑','跳远':'跳帮','游泳':'潜泳','骑车':'骑海豚','开车':'驾船','篮球队':'弯刀队','足球队':'火炮队','汽车':'小船','摩托车':'快艇','船':'海盗船','飞机':'信天翁','火车':'海列车','高铁':'飓风号','兔子':'海岛兔','乌龟':'巨龟','鸡':'鹦鹉','兔':'洞穴兔','牛':'海牛','河':'洋流','路':'航线','池塘':'环礁湖','花坛':'珊瑚礁','跑道':'甲板','走廊':'船舷通道','抽屉':'宝箱','箱子':'木箱','盒子':'宝盒','邮筒':'信瓶','房间':'船舱','宿舍':'水手舱','书架':'藏宝架','一班':'弯刀队','二班':'火炮队','红队':'红胡子队','蓝队':'蓝鲸队','A箱':'A宝箱','B箱':'B宝箱'}
-  },
-  {id:'kitchen', icon:'🧑‍🍳', name:'美食厨房', desc:'用食谱和食材学数学',
-   css:{'--c1':'#e64980','--c2':'#20c997','--bg':'#fff0f6','--topbar-gradient':'linear-gradient(135deg,#c2255c,#e64980)'},
-   map:{'小明':'厨师小明','小红':'糕点师小红','小华':'帮厨小华','小朋友':'小厨师','老师':'主厨','爸爸':'大厨爸爸','妈妈':'甜点师妈妈','爷爷':'老师傅','哥哥':'切配哥哥','弟弟':'学徒弟弟','姐姐':'烘焙姐姐','妹妹':'学徒妹妹','苹果':'鸡蛋','香蕉':'香蕉','橘子':'柠檬','糖果':'马卡龙','铅笔':'擀面杖','笔记本':'食谱','巧克力':'可可粉','卡片':'菜单','书':'料理书','本子':'配方本','笔':'挤花袋','元':'元','分':'分','角':'角','公里':'千米','千米':'千米','米':'米','厘米':'厘米','小时':'小时','分钟':'分钟','秒':'秒','天':'天','岁':'岁','条':'根','个':'份','只':'只','棵树':'棵香草','花':'糖霜花','旗':'餐旗','树苗':'香草苗','跑步':'揉面','跳远':'翻锅','游泳':'搅拌','骑车':'送餐','开车':'开餐车','篮球队':'披萨队','足球队':'汉堡队','汽车':'送餐车','摩托车':'外卖摩托','船':'游轮','飞机':'航班','火车':'餐车','高铁':'高速餐车','兔子':'小兔饼干','乌龟':'龟苓膏','鸡':'烤鸡','兔':'兔肉派','牛':'奶牛','河':'汤锅','路':'传送带','池塘':'汤池','花坛':'香料园','跑道':'出餐通道','走廊':'后厨通道','抽屉':'保鲜盒','箱子':'储物箱','盒子':'餐盒','邮筒':'订单箱','房间':'厨房','宿舍':'员工间','书架':'食谱架','一班':'烘焙组','二班':'烹饪组','红队':'番茄队','蓝队':'蓝莓队','A箱':'A储物箱','B箱':'B储物箱'}
-  }
-];
-var activeTheme='default';
-
-function loadTheme(){ try{return localStorage.getItem('maththeme')||'default';}catch(e){return'default';} }
-function saveTheme(t){ localStorage.setItem('maththeme',t); }
-
-function toggleTheme(){
-  var idx=0; THEMES.forEach(function(t,i){if(t.id===activeTheme)idx=i;});
-  idx=(idx+1)%THEMES.length; activeTheme=THEMES[idx].id;
-  saveTheme(activeTheme); applyThemeCSS(); updateThemeButton();
-  if(currentGame&&gameStage===3) renderGameStage(); // re-render to apply theme text
-}
-
-function getActiveTheme(){ return activeTheme; }
-
-function getThemeObj(){ return THEMES.find(function(t){return t.id===activeTheme;})||THEMES[0]; }
-
-function applyThemeCSS(){
-  var obj=getThemeObj();
-  var root=document.documentElement;
-  if(obj.css){
-    Object.keys(obj.css).forEach(function(k){ root.style.setProperty(k, obj.css[k]); });
-  } else {
-    // Reset to defaults
-    root.style.removeProperty('--c1'); root.style.removeProperty('--c2');
-    root.style.removeProperty('--bg'); root.style.removeProperty('--topbar-gradient');
-    // Also reset topbar
-    document.getElementById('topbar').style.background='';
-  }
-  // Apply topbar gradient
-  var topbar=document.getElementById('topbar');
-  if(obj.css&&obj.css['--topbar-gradient']){
-    topbar.style.background=obj.css['--topbar-gradient'];
-  }else{
-    topbar.style.background='';
-  }
-}
-
-function applyThemeText(originalText){
-  var obj=getThemeObj();
-  if(!obj.map||obj.id==='default') return originalText;
-  var result=originalText;
-  // Apply replacements from longest to shortest to avoid partial matches
-  var keys=Object.keys(obj.map).sort(function(a,b){return b.length-a.length;});
-  keys.forEach(function(k){
-    result=result.split(k).join(obj.map[k]);
-  });
-  return result;
-}
-
-function updateThemeButton(){
-  var obj=getThemeObj();
-  var btn=document.getElementById('themeToggle');
-  if(btn){ btn.textContent=obj.icon; btn.style.display='inline'; }
-}
-
 // ── 菜单渲染 ──
 var GRADES = {
   '一年级':{emoji:'🌱',desc:'直观感知·简单规律',color:'#ff6b6b'},
@@ -586,9 +512,6 @@ document.querySelectorAll('#stageTabs .stage-tab').forEach(function(btn){
 });
 
 function init(){
-  activeTheme=loadTheme();
-  applyThemeCSS();
-  updateThemeButton();
   updateTopStats();
   renderMenu();
 }
