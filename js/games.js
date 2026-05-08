@@ -1283,9 +1283,9 @@ GAMES.cycle = {
     var c=pool[Math.floor(Math.random()*pool.length)];
     gameState.cyAns=c.ans;gameState.cyArr=c.arr;gameState.cyLen=c.len;gameState.cyPos=c.pos;
     container.innerHTML=
-      '<p style="text-align:center;font-size:18px">周期：'+c.arr.split('').join(' ') + ' （每'+c.len+'个一循环）</p>'+
+      '<p style="text-align:center;font-size:18px">周期：'+[...c.arr].join(' ') + ' （每'+c.len+'个一循环）</p>'+
       '<p style="font-weight:700;text-align:center">第 <b style="color:#ff6b6b;font-size:22px">'+c.pos+'</b> 个是什么？</p>'+
-      '<div class="item-grid">'+c.arr.split('').map(function(ch){return '<div class="item-chip" onclick="GAMES.cycle.choose(\''+ch+'\',this)">'+ch+'</div>';}).join('')+'</div>'+
+      '<div class="item-grid">'+[...c.arr].map(function(ch){return '<div class="item-chip" onclick="GAMES.cycle.choose(\''+ch+'\',this)">'+ch+'</div>';}).join('')+'</div>'+
       '<p class="feedback" id="cyfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
   },
   choose: function(ch,el){
