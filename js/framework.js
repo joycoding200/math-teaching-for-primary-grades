@@ -276,7 +276,9 @@ function renderGameStage(){
   var fn=g['stage'+gameStage];
   if(fn) fn(container);
   else{ container.innerHTML='<p style="padding:40px;text-align:center;color:#adb5bd">⏳ 加载中…</p>'; return; }
-  // 练一练模式：注入计时开关、提示系统和难度标签
+  // Stage 1 教学动画
+  if(gameStage===1) animateStage1(container);
+  // 练一练模式：注入计时开关和难度标签
   if(gameStage===3){
     resetHints();
     injectStage3Extras(container);
@@ -502,6 +504,35 @@ function drawBarModel(aVal,bVal,aLabel,bLabel,multiplier,diff){
 // 韦恩图 SVG
 function makeVennSVG(){
   return '<svg viewBox="0 0 300 160" width="280" height="150"><circle cx="110" cy="80" r="60" fill="rgba(255,107,107,.3)" stroke="#ff6b6b" stroke-width="2"/><circle cx="190" cy="80" r="60" fill="rgba(78,205,196,.3)" stroke="#4ecdc4" stroke-width="2"/><text x="70" y="70" font-size="14" fill="#ff6b6b" font-weight="700">🍎</text><text x="210" y="70" font-size="14" fill="#4ecdc4" font-weight="700">🍌</text><text x="145" y="85" font-size="13" fill="#a29bfe" font-weight="700">都喜欢</text></svg>';
+}
+
+// ── Stage 1 教学动画：步骤逐条揭示 ──
+function animateStage1(container){
+  var steps=container.querySelectorAll('.explain-box .step');
+  var formula=container.querySelector('.formula-box');
+  var svg=container.querySelector('.concept-svg');
+
+  // SVG 先入场
+  if(svg){ svg.classList.add('anim-ready'); }
+
+  // 步骤逐条揭示（Staggered reveal）
+  steps.forEach(function(step,i){
+    setTimeout(function(){
+      step.classList.add('anim-reveal');
+      // 步骤数字弹入
+      var num=step.querySelector('.step-num');
+      if(num){ setTimeout(function(){num.classList.add('anim-pop');},200); }
+      // 高亮文字发光
+      var hl=step.querySelector('.highlight');
+      if(hl){ setTimeout(function(){hl.classList.add('anim-glow');},400); }
+    }, i*350); // 每条步骤间隔 350ms
+  });
+
+  // 公式框在所有步骤后弹入
+  if(formula){
+    var delay=steps.length*350+200;
+    setTimeout(function(){ formula.classList.add('anim-ready'); }, delay);
+  }
 }
 
 // ── 初始化 ──

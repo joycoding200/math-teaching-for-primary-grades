@@ -208,6 +208,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;heigh
   margin:8px 0;box-shadow:0 2px 12px rgba(255,212,59,.15);
 }
 .concept-svg{max-width:520px;width:100%;margin:0 auto}
+.concept-svg.anim-ready{animation:fadeIn .5s}
+
+/* ── Stage 1 Animation: step-by-step reveal ── */
+.explain-box .step{opacity:0;transform:translateX(-20px)}
+.explain-box .step.anim-reveal{animation:stepReveal .5s cubic-bezier(.34,1.56,.64,1) forwards}
+.explain-box .step-num.anim-pop{animation:stepNumPop .3s cubic-bezier(.34,1.56,.64,1) forwards}
+.explain-box .highlight.anim-glow{animation:highlightGlow .6s ease-in-out}
+
+.formula-box.anim-ready{opacity:0;animation:formulaBounce .6s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes stepReveal{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes stepNumPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes highlightGlow{0%,100%{color:var(--c1)}50%{color:#ff8787;transform:scale(1.05)}}
+@keyframes formulaBounce{0%{opacity:0;transform:scale(.8) translateY(12px)}60%{transform:scale(1.04) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
 
 /* ====== Keyframe Animations ====== */
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
