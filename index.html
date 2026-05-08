@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学思维小课堂</title>
+<style>
+/* ====== CSS Variables ====== */
+:root {
+  --c1:#ff6b6b; --c2:#4ecdc4; --c3:#feca57; --c4:#a29bfe; --c5:#fd79a8; --c6:#00b894;
+  --bg:#f0f4ff; --card:#fff; --text:#2d3436; --sub:#636e72; --radius:18px; --shadow:0 4px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  background:var(--bg); min-height:100vh; color:var(--text);
+  user-select:none; -webkit-user-select:none;
+}
+/* ====== Top Bar ====== */
+.topbar{
+  background:linear-gradient(135deg,#ff6b6b,#feca57); color:#fff; padding:14px 20px;
+  display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:50;
+  box-shadow:0 2px 12px rgba(255,107,107,.3);
+}
+.topbar h1{font-size:20px;flex:1}
+.topbar .back-btn{
+  background:rgba(255,255,255,.25); border:none; color:#fff; width:36px;height:36px;
+  border-radius:50%; font-size:20px; cursor:pointer; display:none; align-items:center; justify-content:center;
+}
+.topbar .back-btn.show{display:flex}
+.topbar .stars-total{font-size:14px;opacity:.9}
+
+/* ====== Main Container ====== */
+.container{max-width:960px;margin:0 auto;padding:16px}
+
+/* ====== Menu Grid ====== */
+.menu-view{}
+.section-title{font-size:18px;margin:20px 0 10px;color:var(--sub);display:flex;align-items:center;gap:8px}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:8px}
+.topic-card{
+  background:var(--card);border-radius:var(--radius);padding:16px 10px;text-align:center;
+  cursor:pointer;transition:all .25s;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  border:2px solid transparent;
+}
+.topic-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.14);border-color:var(--c1)}
+.topic-card .icon{font-size:36px;display:block;margin-bottom:6px}
+.topic-card .name{font-size:14px;font-weight:700;color:var(--text)}
+.topic-card .stars{font-size:11px;color:#feca57;margin-top:3px}
+.topic-card .badge{position:absolute;top:8px;right:8px;background:var(--c1);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px}
+
+/* ====== Game View ====== */
+.game-view{display:none;flex-direction:column;gap:14px}
+.game-view.active{display:flex}
+.game-header{text-align:center}
+.game-header h2{font-size:22px}
+.game-header .desc{font-size:13px;color:var(--sub);margin-top:4px}
+
+/* Stage tabs */
+.stage-tabs{display:flex;gap:0;background:#e9ecef;border-radius:30px;padding:3px;align-self:center}
+.stage-tab{
+  padding:8px 20px;border:none;background:none;border-radius:28px;font-size:13px;font-weight:600;
+  cursor:pointer;color:#868e96;transition:all .3s;font-family:inherit;
+}
+.stage-tab.active{background:#fff;color:var(--c1);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.stage-content{min-height:300px;background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:14px}
+.stage-panel{display:none;flex-direction:column;align-items:center;gap:14px;width:100%}
+.stage-panel.active{display:flex}
+
+/* ====== Shared Components ====== */
+.btn{
+  padding:10px 24px;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;
+  transition:all .25s;font-family:inherit;
+}
+.btn-p{background:var(--c1);color:#fff}
+.btn-p:hover{opacity:.85;transform:translateY(-1px)}
+.btn-s{background:var(--c2);color:#fff}
+.btn-o{background:#fff;color:var(--c1);border:2px solid var(--c1)}
+.btn-o:hover{background:#fff5f5}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+.feedback{font-size:14px;min-height:22px;text-align:center;font-weight:600}
+.feedback.ok{color:#00b894}
+.feedback.err{color:var(--c1)}
+
+.answer-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;font-size:16px}
+.answer-input{
+  width:72px;padding:10px;text-align:center;border:2px solid #dee2e6;border-radius:12px;
+  font-size:18px;font-weight:700;font-family:inherit;transition:border-color .3s;
+}
+.answer-input:focus{outline:none;border-color:var(--c2)}
+.answer-input.ok{border-color:#00b894;background:#f0fff4}
+.answer-input.err{border-color:var(--c1);background:#fff5f5;animation:shake .4s}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ====== Balance Scale ====== */
+.scale-wrap{position:relative;width:100%;max-width:400px;height:240px;margin:0 auto}
+.scale-wrap svg{width:100%;height:100%}
+.scale-items{position:absolute;display:flex;gap:2px;flex-wrap:wrap;justify-content:center;align-items:flex-end;pointer-events:none}
+.scale-left{left:10%;bottom:22%;width:26%}
+.scale-right{right:10%;bottom:22%;width:26%}
+.scale-item{font-size:26px;pointer-events:auto;cursor:pointer;transition:all .3s;line-height:1}
+.scale-item:hover{transform:scale(1.2)}
+.scale-item.removing{opacity:0;transform:scale(0)}
+
+/* ====== Bar Model ====== */
+.bar-wrap{width:100%;max-width:440px}
+.bar-row{display:flex;align-items:center;gap:6px;margin:6px 0}
+.bar-lbl{font-weight:700;font-size:15px;min-width:40px;text-align:center}
+.bar-track{flex:1;height:36px;background:#f1f3f5;border-radius:10px;position:relative;overflow:visible}
+.bar-fill{height:100%;border-radius:10px;transition:width .5s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;min-width:36px}
+.bar-fill.a{background:linear-gradient(90deg,#ff6b6b,#ff8787)}
+.bar-fill.b{background:linear-gradient(90deg,#4ecdc4,#63e6be)}
+.bar-fill.d{background:linear-gradient(90deg,#feca57,#ffd43b);color:#495057}
+.bar-seg{display:flex;width:100%;height:100%;gap:2px}
+.bar-seg span{flex:1;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;border-radius:4px}
+.bar-seg span.hl{background:rgba(255,255,255,.55)}
+
+/* ====== Slider ====== */
+.slider-grp{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.slider-grp label{font-weight:600;font-size:14px}
+.slider-val{font-size:22px;font-weight:700;color:var(--c1);background:#fff5f5;padding:3px 14px;border-radius:16px}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:8px;background:#e9ecef;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--c1);cursor:pointer;box-shadow:0 2px 8px rgba(255,107,107,.4)}
+
+/* ====== Venn ====== */
+.venn-wrap{position:relative;width:300px;height:220px;margin:0 auto}
+.venn-wrap svg{width:100%;height:100%}
+.venn-wrap .region{cursor:pointer;transition:opacity .3s}
+.venn-wrap .region:hover{opacity:.7}
+
+/* ====== Grid items ====== */
+.item-grid{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.item-chip{
+  background:#f8f9fa;border:2px solid #dee2e6;border-radius:12px;padding:8px 14px;
+  font-size:16px;cursor:pointer;transition:all .25s;font-weight:600;
+}
+.item-chip:hover{border-color:var(--c2);background:#f0fffc}
+.item-chip.selected{background:var(--c2);color:#fff;border-color:var(--c2)}
+.item-chip.wrong{background:var(--c1);color:#fff;border-color:var(--c1);animation:shake .4s}
+
+/* ====== Character animation area ====== */
+.anim-track{position:relative;width:100%;max-width:500px;height:80px;background:#f8f9fa;border-radius:16px;overflow:hidden}
+.anim-char{position:absolute;font-size:36px;transition:left .1s linear;bottom:8px}
+.anim-home{position:absolute;bottom:4px;font-size:11px;color:var(--sub);font-weight:600}
+
+/* ====== Celebration ====== */
+.cele{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
+.cele .confetti{position:absolute;animation:fall 1.6s ease-out forwards}
+@keyframes fall{0%{transform:translateY(-80px) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ====== Trees on path ====== */
+.tree-row{display:flex;gap:0;align-items:center;flex-wrap:wrap;justify-content:center}
+.tree{font-size:28px;transition:all .3s}
+.tree-spacer{width:30px;height:4px;background:#e9ecef;transition:width .3s}
+
+/* ====== Responsive ====== */
+@media(max-width:600px){
+  .topic-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
+  .topic-card{padding:12px 6px}
+  .topic-card .icon{font-size:28px}
+  .topic-card .name{font-size:12px}
+  .topbar h1{font-size:17px}
+  .scale-wrap{height:200px}
+  .scale-item{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <button class="back-btn" id="backBtn" onclick="goMenu()">←</button>
+  <h1 id="topTitle">🧮 数学思维小课堂</h1>
+  <span class="stars-total" id="starTotal">⭐ 0</span>
+</div>
+
+<div class="container" id="container">
+<!-- ==================== MENU ==================== -->
+<div class="menu-view" id="menuView"></div>
+
+<!-- ==================== GAME VIEW ==================== -->
+<div class="game-view" id="gameView">
+  <div class="game-header"><h2 id="gameTitle"></h2><div class="desc" id="gameDesc"></div></div>
+  <div class="stage-tabs" id="stageTabs">
+    <button class="stage-tab active" data-stage="1">🎯 看一看</button>
+    <button class="stage-tab" data-stage="2">🤹 玩一玩</button>
+    <button class="stage-tab" data-stage="3">🏆 练一练</button>
+  </div>
+  <div class="stage-content" id="stageContent"></div>
+</div>
+</div>
+
+<div class="cele" id="cele"></div>
+
+<script>
+// ==================== FRAMEWORK ====================
+const TOPICS = [
+  // 一年级：直观感知与简单规律
+  {id:'pattern',icon:'🔮',name:'找规律',cat:'一年级',g:'pattern'},
+  {id:'countshape',icon:'🔷',name:'数图形',cat:'一年级',g:'countshape'},
+  {id:'balance',icon:'🎯',name:'移多补少',cat:'一年级',g:'balance'},
+  {id:'simplelogic',icon:'🔍',name:'简单推理',cat:'一年级',g:'simplelogic'},
+  {id:'queue',icon:'👫',name:'排队问题',cat:'一年级',g:'queue'},
+  // 二年级：等量关系与基础应用
+  {id:'substitution',icon:'⚖️',name:'等量代换',cat:'二年级',g:'substitution'},
+  {id:'cycle',icon:'🔁',name:'周期问题',cat:'二年级',g:'cycle'},
+  {id:'tree',icon:'🌳',name:'植树问题',cat:'二年级',g:'tree'},
+  {id:'normalization',icon:'🧮',name:'归一问题',cat:'二年级',g:'normalization'},
+  {id:'sumdiff',icon:'📐',name:'和差问题',cat:'二年级',g:'sumdiff'},
+  // 三年级：倍数关系与逆向思维
+  {id:'summulti',icon:'📏',name:'和倍问题',cat:'三年级',g:'summulti'},
+  {id:'diffmulti',icon:'📊',name:'差倍问题',cat:'三年级',g:'diffmulti'},
+  {id:'age',icon:'👴',name:'年龄问题',cat:'三年级',g:'age'},
+  {id:'profitloss',icon:'📦',name:'盈亏问题',cat:'三年级',g:'profitloss'},
+  {id:'reverse',icon:'↩️',name:'还原问题',cat:'三年级',g:'reverse'},
+  {id:'average',icon:'📈',name:'平均数',cat:'三年级',g:'average'},
+  // 四年级：经典模型与原理
+  {id:'chickenrabbit',icon:'🐔',name:'鸡兔同笼',cat:'四年级',g:'chickenrabbit'},
+  {id:'venn',icon:'🔴',name:'容斥原理',cat:'四年级',g:'venn'},
+  {id:'pigeonhole',icon:'🗄️',name:'抽屉原理',cat:'四年级',g:'pigeonhole'},
+  {id:'logic',icon:'🧩',name:'逻辑推理',cat:'四年级',g:'logic'},
+  {id:'meeting',icon:'🏃',name:'相遇问题',cat:'四年级',g:'meeting'},
+  {id:'chase',icon:'💨',name:'追及问题',cat:'四年级',g:'chase'},
+  // 五年级：综合应用与抽象建模
+  {id:'boatcurrent',icon:'⛵',name:'流水行船',cat:'五年级',g:'boatcurrent'},
+  {id:'work',icon:'🔧',name:'工程问题',cat:'五年级',g:'work'},
+  {id:'cowgrass',icon:'🐄',name:'牛吃草',cat:'五年级',g:'cowgrass'},
+];
+
+const GAMES = {};
+let currentGame = null;
+let gameStage = 1;
+let gameState = {};
+
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem('mathgames')||'{}'); }catch(e){ return {}; } }
+function saveProgress(p){ localStorage.setItem('mathgames',JSON.stringify(p)); }
+function getStars(gameId){ const p=loadProgress(); return p[gameId]||0; }
+function setStars(gameId,stars){ const p=loadProgress(); p[gameId]=Math.max(p[gameId]||0,stars); saveProgress(p); updateStarTotal(); }
+
+function updateStarTotal(){
+  const p=loadProgress(); let t=0; Object.values(p).forEach(v=>t+=v);
+  document.getElementById('starTotal').textContent='⭐ '+t;
+}
+
+// Render menu
+function renderMenu(){
+  const cats=[...new Set(TOPICS.map(t=>t.cat))];
+  const grades={'一年级':{emoji:'🌱',desc:'直观感知·简单规律',color:'#ff6b6b'},
+               '二年级':{emoji:'🌿',desc:'等量关系·基础应用',color:'#4ecdc4'},
+               '三年级':{emoji:'🌳',desc:'倍数关系·逆向思维',color:'#feca57'},
+               '四年级':{emoji:'🌲',desc:'经典模型·原理入门',color:'#a29bfe'},
+               '五年级':{emoji:'🏆',desc:'综合应用·抽象建模',color:'#fd79a8'}};
+  let h='';
+  cats.forEach(cat=>{
+    const g=grades[cat]||{emoji:'📚',desc:'',color:'#636e72'};
+    h+='<div class="section-title"><span style="font-size:24px">'+g.emoji+'</span> <span style="color:'+g.color+'">'+cat+'</span><span style="font-size:11px;color:#adb5bd;margin-left:8px">'+g.desc+'</span></div><div class="topic-grid">';
+    TOPICS.filter(t=>t.cat===cat).forEach(t=>{
+      const s=getStars(t.id);
+      h+='<div class="topic-card" onclick="openGame(\''+t.id+'\')">';
+      h+='<span class="icon">'+t.icon+'</span>';
+      h+='<span class="name">'+t.name+'</span>';
+      h+='<div class="stars">'+'⭐'.repeat(s)+'☆'.repeat(3-s)+'</div>';
+      if(s>=3) h+='<span class="badge" style="background:#00b894">✓</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  document.getElementById('menuView').innerHTML=h;
+}
+
+function goMenu(){
+  document.getElementById('menuView').style.display='block';
+  document.getElementById('gameView').classList.remove('active');
+  document.getElementById('backBtn').classList.remove('show');
+  document.getElementById('topTitle').textContent='🧮 数学思维小课堂';
+  currentGame=null;
+  renderMenu();
+}
+
+function openGame(gameId){
+  currentGame=gameId;
+  gameStage=1;
+  gameState={};
+  document.getElementById('menuView').style.display='none';
+  document.getElementById('gameView').classList.add('active');
+  document.getElementById('backBtn').classList.add('show');
+  const t=TOPICS.find(x=>x.id===gameId);
+  document.getElementById('topTitle').textContent=t.icon+' '+t.name;
+  document.getElementById('gameTitle').textContent=t.name;
+  document.getElementById('gameDesc').textContent=t.cat+' · 小学奥数思维训练';
+  // Reset stage tabs
+  document.querySelectorAll('#stageTabs .stage-tab').forEach((b,i)=>{
+    b.classList.toggle('active',i===0);
+  });
+  renderGameStage();
+}
+
+function switchStage(stage){
+  gameStage=stage;
+  document.querySelectorAll('#stageTabs .stage-tab').forEach((b,i)=>{
+    b.classList.toggle('active',i+1===stage);
+  });
+  renderGameStage();
+}
+
+function renderGameStage(){
+  if(!currentGame) return;
+  const g=GAMES[currentGame];
+  const container=document.getElementById('stageContent');
+  if(!g){ container.innerHTML='<p>游戏开发中...</p>'; return; }
+  const fn=g['stage'+gameStage];
+  if(fn) fn(container);
+  else container.innerHTML='<p>加载中...</p>';
+}
+
+// Init stage tabs
+document.querySelectorAll('#stageTabs .stage-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>switchStage(parseInt(btn.dataset.stage)));
+});
+
+function celebrate(){
+  const c=document.getElementById('cele');
+  const cols=['#ff6b6b','#feca57','#4ecdc4','#a29bfe','#fd79a8','#00b894','#ffd93d','#6c5ce7'];
+  for(let i=0;i<50;i++){
+    const el=document.createElement('div'); el.className='confetti';
+    el.style.left=Math.random()*100+'%'; el.style.top=-(Math.random()*40)+'px';
+    el.style.background=cols[Math.floor(Math.random()*cols.length)];
+    el.style.animationDelay=Math.random()*.5+'s';
+    el.style.animationDuration=(1+Math.random()*1.5)+'s';
+    el.style.borderRadius=Math.random()>.5?'50%':'3px';
+    el.style.width=(6+Math.random()*10)+'px'; el.style.height=(6+Math.random()*10)+'px';
+    c.appendChild(el); setTimeout(()=>el.remove(),2000);
+  }
+}
+
+// ====== Shared helpers ======
+function makeScaleSVG(){return '<svg viewBox="0 0 400 220"><polygon points="200,210 185,170 215,170" fill="#adb5bd"/><line x1="60" y1="160" x2="340" y2="160" stroke="#495057" stroke-width="5"/><line x1="100" y1="160" x2="100" y2="192" stroke="#adb5bd" stroke-width="2"/><line x1="300" y1="160" x2="300" y2="192" stroke="#adb5bd" stroke-width="2"/><ellipse cx="100" cy="198" rx="42" ry="10" fill="#f8f9fa" stroke="#adb5bd" stroke-width="2"/><ellipse cx="300" cy="198" rx="42" ry="10" fill="#f8f9fa" stroke="#adb5bd" stroke-width="2"/></svg>';}
+
+function drawBarModel(aVal,bVal,aLabel,bLabel,multiplier,diff){
+  const max=Math.max(aVal,bVal)*1.25;
+  const ap=(aVal/max*100); const bp=(bVal/max*100);
+  let segs=''; for(let i=0;i<multiplier;i++) segs+='<span'+(i===multiplier-1?' class="hl"':'')+'></span>';
+  return '<div class="bar-wrap"><div class="bar-row"><span class="bar-lbl">'+aLabel+'</span><div class="bar-track"><div class="bar-fill a" style="width:'+ap+'%"><div class="bar-seg">'+segs+'</div></div></div><span style="font-weight:700;color:#ff6b6b">'+aVal+'</span></div><div class="bar-row"><span class="bar-lbl">'+bLabel+'</span><div class="bar-track"><div class="bar-fill b" style="width:'+bp+'%"><span>'+bVal+'</span></div></div><span style="font-weight:700;color:#4ecdc4">'+bVal+'</span></div><p style="text-align:center;color:#868e96;font-size:13px;margin-top:6px">'+aLabel+' - '+bLabel+' = <b style="color:#f59f00">'+diff+'</b>，'+aLabel+' 是 '+bLabel+' 的 <b style="color:#ff6b6b">'+multiplier+'倍</b></p></div>';
+}
+
+function genRandInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+// ==================== GAME 1: 等量代换 ====================
+GAMES.substitution = {
+  stage1(container){
+    gameState={pineapple:1,apple:3,currentApples:3};
+    container.innerHTML='<p style="text-align:center;font-size:15px;color:#495057">天平两边一样重时，天平<strong>平衡</strong>。<br>看，1个🍍 和 3个🍎 一样重！</p><div class="scale-wrap"><div id="s1svg"></div><div class="scale-items scale-left" id="s1L"></div><div class="scale-items scale-right" id="s1R"></div></div><p style="color:#adb5bd;font-size:13px">✅ 天平平衡 → 1🍍 = 3🍎</p>';
+    document.getElementById('s1svg').innerHTML=makeScaleSVG();
+    document.getElementById('s1L').innerHTML='<span class="scale-item" style="animation:pop .4s">🍍</span>';
+    document.getElementById('s1R').innerHTML='<span class="scale-item" style="animation:pop .4s">🍎</span><span class="scale-item" style="animation:pop .4s .1s">🍎</span><span class="scale-item" style="animation:pop .4s .2s">🍎</span>';
+  },
+  stage2(container){
+    gameState={applesLeft:3,bananasPlaced:0};
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">已知 1个🍍 = 3个🍎，而且 1个🍎 = 2个🍌<br>点击苹果，换成香蕉试试！</p>'+
+      '<div class="scale-wrap"><div id="s2svg"></div><div class="scale-items scale-left" id="s2L"></div><div class="scale-items scale-right" id="s2R"></div></div>'+
+      '<div style="background:#fff3bf;padding:10px 20px;border-radius:14px;border:2px dashed #feca57;display:flex;align-items:center;gap:10px"><span>1个</span><span style="font-size:28px">🍎</span><span style="font-weight:700;color:#f59f00">=</span><span>2个</span><span style="font-size:28px">🍌</span></div>'+
+      '<p class="feedback" id="s2fb">点击右边的苹果来替换吧！已替换: 0/3</p>'+
+      '<button class="btn btn-o" onclick="GAMES.substitution.resetS2()">🔄 重置</button>';
+    document.getElementById('s2svg').innerHTML=makeScaleSVG();
+    document.getElementById('s2L').innerHTML='<span class="scale-item">🍍</span>';
+    const r=document.getElementById('s2R');
+    r.innerHTML='';
+    for(let i=0;i<3;i++){
+      const el=document.createElement('span'); el.className='scale-item'; el.textContent='🍎';
+      el.onclick=function(){ GAMES.substitution.replaceApple(this); };
+      r.appendChild(el);
+    }
+  },
+  replaceApple(el){
+    if(el.classList.contains('removing')) return;
+    el.classList.add('removing');
+    setTimeout(()=>{
+      el.remove();
+      const r=document.getElementById('s2R');
+      const b1=document.createElement('span');b1.className='scale-item';b1.textContent='🍌';b1.style.animation='pop .3s';
+      const b2=document.createElement('span');b2.className='scale-item';b2.textContent='🍌';b2.style.animation='pop .3s .1s';
+      r.appendChild(b1); r.appendChild(b2);
+      gameState.applesLeft--; gameState.bananasPlaced+=2;
+      const fb=document.getElementById('s2fb');
+      fb.textContent='已替换: '+(3-gameState.applesLeft)+'/3。右边: '+(gameState.applesLeft)+'个🍎 + '+gameState.bananasPlaced+'个🍌';
+      if(gameState.applesLeft===0){
+        fb.textContent='🎉 太棒了！3个苹果全换成了6个香蕉！所以 1🍍 = 6🍌';
+        fb.style.color='#00b894';
+        setStars('substitution',2); celebrate(); updateStarTotal();
+      }
+    },300);
+  },
+  resetS2(){ gameStage=2; renderGameStage(); },
+  stage3(container){
+    const probs=[
+      {q:'1个🍉 = 4个🍑，1个🍑 = 3个🍇，1个🍉 = ?个🍇',ans:12,hint:'4×3=?'},
+      {q:'1只🐔 = 2只🐣，1只🐣 = 5只🐛，1只🐔 = ?只🐛',ans:10,hint:'2×5=?'},
+      {q:'1块🍰 = 6块🍪，1块🍪 = 3颗🍬，1块🍰 = ?颗🍬',ans:18,hint:'6×3=?'},
+      {q:'1个🥝 = 3个🍊，1个🍊 = 4个🫐，1个🥝 = ?个🫐',ans:12,hint:'3×4=?'},
+      {q:'1把🔑 = 5个🪙，1个🪙 = 2颗💎，1把🔑 = ?颗💎',ans:10,hint:'5×2=?'},
+    ];
+    const p=probs[Math.floor(Math.random()*probs.length)];
+    gameState.subAns=p.ans;
+    container.innerHTML=
+      '<p style="font-size:16px;font-weight:600;text-align:center">'+p.q+'</p>'+
+      '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="subAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.substitution.check()">确认 ✓</button></div>'+
+      '<p class="feedback" id="subfb"></p><button class="btn btn-o" onclick="renderGameStage()">再来一题 🔄</button>';
+  },
+  check(){
+    const ans=parseInt(document.getElementById('subAns').value);
+    const fb=document.getElementById('subfb');
+    if(isNaN(ans)){fb.textContent='请输入数字哦～';return}
+    if(ans===gameState.subAns){fb.textContent='✅ 太棒了！';fb.className='feedback ok';document.getElementById('subAns').className='answer-input ok';setStars('substitution',3);celebrate();updateStarTotal()}
+    else {fb.textContent='❌ 再想想哦～';fb.className='feedback err';document.getElementById('subAns').className='answer-input err';setTimeout(()=>document.getElementById('subAns').className='answer-input',500)}
+  }
+};
+
+// ==================== GAME 2: 简单推理 ====================
+GAMES.simplelogic = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px">推理就是根据线索找到答案！<br>比如：小明、小红、小华三人分别拿着🍎、🍌、🍇<br><br>线索：<br>① 小明拿的不是🍎<br>② 小红拿的是🍌<br><br>那么小明拿的是？小华拿的是？<br><br><b style="color:#4ecdc4">小红拿🍌 → 剩下🍎和🍇 → 小明不拿🍎 → 小明拿🍇，小华拿🍎</b></p>';
+  },
+  stage2(container){
+    const puzzles=[
+      {people:['小明','小红','小华'],items:['🍎','🍌','🍇'],clues:['小明拿的不是🍎','小红拿的是🍌'],ans:{'小明':'🍇','小红':'🍌','小华':'🍎'}},
+      {people:['小刚','小丽','小强'],items:['🐶','🐱','🐰'],clues:['小刚养的不是🐱','小强养的是🐶'],ans:{'小刚':'🐰','小丽':'🐱','小强':'🐶'}},
+    ];
+    const pz=puzzles[Math.floor(Math.random()*puzzles.length)];
+    gameState.slPuzzle=pz;
+    let h='<p style="font-weight:700;text-align:center">三人分别拿着：'+pz.items.join('、')+'</p><p style="font-size:14px;color:#636e72">线索：'+pz.clues.map((c,i)=>(i+1)+'、'+c).join('；')+'</p>';
+    h+='<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">';
+    pz.people.forEach(person=>{
+      h+='<div style="text-align:center"><div style="font-weight:700;margin-bottom:6px">'+person+'</div>';
+      pz.items.forEach(item=>{
+        h+='<div class="item-chip sl-choice" data-person="'+person+'" data-item="'+item+'" onclick="GAMES.simplelogic.choose(this)" style="margin:3px">'+item+'</div>';
+      });
+      h+='</div>';
+    });
+    h+='</div><p class="feedback" id="slfb">点击每个人对应的物品吧！</p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    container.innerHTML=h;
+  },
+  choose(el){
+    const person=el.dataset.person; const item=el.dataset.item;
+    document.querySelectorAll('.sl-choice[data-person="'+person+'"]').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    // Check all
+    const all=document.querySelectorAll('.sl-choice.selected');
+    if(all.length===gameState.slPuzzle.people.length){
+      let correct=true;
+      all.forEach(a=>{ if(gameState.slPuzzle.ans[a.dataset.person]!==a.dataset.item) correct=false; });
+      const fb=document.getElementById('slfb');
+      if(correct){fb.textContent='✅ 推理正确！太棒了！';fb.className='feedback ok';setStars('simplelogic',3);celebrate();updateStarTotal()}
+      else {fb.textContent='❌ 有些不对哦，再想想线索';fb.className='feedback err'}
+    }
+  },
+  stage3(container){
+    GAMES.simplelogic.stage2(container); // Same interaction
+  }
+};
+
+// ==================== GAME 3: 逻辑推理(真假话) ====================
+GAMES.logic = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px;line-height:1.8">🤔 <b>真假话推理</b><br><br>一个人说真话，一个人说假话。<br>如何判断真相？<br><br>例：A说"不是我"，B说"是A"<br>只有一人说真话，谁干的？<br><br>假设A说真话→不是A→B说假话→不是A<br>→ 矛盾！<br>假设B说真话→是A→A说假话→是A<br>→ ✅ 成立！所以是A干的。</p>';
+  },
+  stage2(container){
+    const pz={suspects:['A','B'],statements:{'A':'不是我做的','B':'是A做的'},truthCount:1,culprit:'A'};
+    gameState.lgPuzzle=pz;
+    let h='<p style="text-align:center;font-weight:700">💰 钱被谁偷了？只有1人说真话</p>';
+    h+='<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">';
+    for(const [who,stmt] of Object.entries(pz.statements)){
+      h+='<div class="item-chip lg-chip" data-who="'+who+'" onclick="GAMES.logic.toggleTruth(this)" style="padding:12px 20px;font-size:15px">'+who+'说："'+stmt+'"<br><small style="color:#adb5bd">点击标记为说真话</small></div>';
+    }
+    h+='</div><p style="font-size:14px;text-align:center">点击你认为<b>说真话</b>的那个人</p><p class="feedback" id="lgfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    container.innerHTML=h;
+  },
+  toggleTruth(el){
+    document.querySelectorAll('.lg-chip').forEach(c=>{c.style.borderColor='#dee2e6';c.style.background='#f8f9fa'});
+    el.style.borderColor='#4ecdc4'; el.style.background='#f0fffc';
+    const who=el.dataset.who;
+    const fb=document.getElementById('lgfb');
+    fb.textContent='想想看：如果'+who+'说真话，其他人的话是否成立？';
+    if(who==='B'){fb.textContent='✅ 正确！B说真话→是A干的→A说假话→成立！';fb.className='feedback ok';setStars('logic',2);celebrate();updateStarTotal()}
+  },
+  stage3(container){
+    GAMES.logic.stage2(container);
+  }
+};
+
+// ==================== GAME 4: 找规律 ====================
+GAMES.pattern = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">观察规律，猜猜下一个是什么？</p>'+
+      '<div style="display:flex;gap:10px;font-size:36px;justify-content:center;flex-wrap:wrap" id="ptDemo"></div>'+
+      '<p style="color:#adb5bd;font-size:13px;text-align:center">规律：红蓝红蓝红... → 下一个是 <b>蓝</b> 🔵</p>';
+    const seq=['🔴','🔵','🔴','🔵','🔴','?'];
+    document.getElementById('ptDemo').innerHTML=seq.map(s=>'<span style="background:#f8f9fa;padding:10px;border-radius:12px;width:50px;text-align:center">'+s+'</span>').join('');
+  },
+  stage2(container){
+    const patterns=[
+      {seq:['🔴','🔵','🔴','🔵','🔴','?'],opts:['🔵','🔴','🟢'],ans:0,explain:'颜色交替：红蓝红蓝红→蓝'},
+      {seq:['⭐','🌟','⭐','🌟','⭐','?'],opts:['⭐','🌟','✨'],ans:1,explain:'形状交替：普通→闪光→普通→闪光→普通→闪光'},
+      {seq:['1','3','5','7','?'],opts:['8','9','10'],ans:1,explain:'每次+2：1,3,5,7→9'},
+      {seq:['2','4','8','16','?'],opts:['24','32','30'],ans:1,explain:'每次×2：2,4,8,16→32'},
+      {seq:['🔺','🔺🔺','🔺🔺🔺','🔺🔺🔺🔺','?'],opts:['🔺🔺🔺🔺🔺','🔺','🔺🔺'],ans:0,explain:'数量递增：1,2,3,4→5个三角形'},
+    ];
+    const p=patterns[Math.floor(Math.random()*patterns.length)];
+    gameState.ptAns=p.ans;
+    let h='<div style="display:flex;gap:8px;font-size:30px;justify-content:center;flex-wrap:wrap">';
+    p.seq.forEach(s=>h+='<span style="background:#f8f9fa;padding:8px 12px;border-radius:12px">'+s+'</span>');
+    h+='</div><p style="font-weight:700">下一个是什么？</p><div class="item-grid">';
+    p.opts.forEach((o,i)=>{h+='<div class="item-chip" onclick="GAMES.pattern.choose('+i+',this)">'+o+'</div>';});
+    h+='</div><p class="feedback" id="ptfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    container.innerHTML=h;
+  },
+  choose(idx,el){
+    const fb=document.getElementById('ptfb');
+    if(idx===gameState.ptAns){fb.textContent='✅ 正确！';fb.className='feedback ok';el.classList.add('selected');setStars('pattern',2);celebrate();updateStarTotal()}
+    else {fb.textContent='❌ 再观察一下规律吧';fb.className='feedback err';el.classList.add('wrong');setTimeout(()=>el.classList.remove('wrong'),500)}
+  },
+  stage3(container){ GAMES.pattern.stage2(container); }
+};
+
+// ==================== GAME 5: 数图形 ====================
+GAMES.countshape = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">数一数，图中有几个三角形？</p>'+
+      '<div style="text-align:center;font-size:80px;line-height:1">🔺<br><span style="font-size:14px;color:#adb5bd">1个三角形</span></div>'+
+      '<p style="text-align:center;font-size:14px">再看这个：</p>'+
+      '<div style="text-align:center;font-size:50px;line-height:1">🔺<br>🔺<br><span style="font-size:14px;color:#adb5bd">2个小三角形，组在一起还有1个大三角形 = 3个</span></div>';
+  },
+  stage2(container){
+    const probs=[
+      {svg:'<svg viewBox="0 0 200 100" width="200" height="100"><rect x="0" y="0" width="200" height="100" fill="none" stroke="#333" stroke-width="2"/><line x1="0" y1="50" x2="200" y2="50" stroke="#333" stroke-width="2"/><line x1="100" y1="0" x2="100" y2="100" stroke="#333" stroke-width="2"/></svg>',q:'图中有几个长方形？',ans:4,explain:'4个小长方形'},
+      {svg:'<svg viewBox="0 0 200 100" width="200" height="100"><rect x="0" y="0" width="200" height="100" fill="none" stroke="#333" stroke-width="2"/><line x1="0" y1="0" x2="200" y2="100" stroke="#333" stroke-width="2"/></svg>',q:'图中有几个三角形？',ans:2,explain:'对角线分成了2个三角形'},
+    ];
+    const p=probs[Math.floor(Math.random()*probs.length)];
+    gameState.csAns=p.ans;
+    container.innerHTML=
+      '<p style="font-weight:700;text-align:center">'+p.q+'</p>'+p.svg+
+      '<div class="answer-row"><span>答案：</span><input type="number" class="answer-input" id="csAns" placeholder="?" min="0" max="99"><button class="btn btn-p" onclick="GAMES.countshape.check()">确认 ✓</button></div>'+
+      '<p class="feedback" id="csfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const ans=parseInt(document.getElementById('csAns').value);
+    const fb=document.getElementById('csfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.csAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('countshape',2);celebrate();updateStarTotal()}
+    else {fb.textContent='❌ 再仔细数数';fb.className='feedback err'}
+  },
+  stage3(container){ GAMES.countshape.stage2(container); }
+};
+
+// ==================== GAME 6: 周期问题 ====================
+GAMES.cycle = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">周期就是重复出现的规律！</p>'+
+      '<div style="display:flex;gap:6px;font-size:28px;justify-content:center;flex-wrap:wrap">'+['🔴','🟡','🟢','🔴','🟡','🟢','🔴','🟡','🟢','🔴','🟡','🟢'].map((c,i)=>'<span>'+c+(i===8?'👈第9个':'')+'</span>').join('')+'</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:8px">每3个一循环：🔴🟡🟢<br>第9个：9÷3=3...0 → 第3个 → 🟢<br>第10个：10÷3=3...1 → 第1个 → 🔴</p>';
+  },
+  stage2(container){
+    const cycles=[{arr:'🔴🟡🟢',len:3,pos:11,ans:'🟡'},{arr:'⭐🌟✨',len:3,pos:8,ans:'🌟'},{arr:'🐶🐱🐰',len:3,pos:13,ans:'🐶'}];
+    const c=cycles[Math.floor(Math.random()*cycles.length)];
+    gameState.cyAns=c.ans; gameState.cyArr=c.arr; gameState.cyLen=c.len; gameState.cyPos=c.pos;
+    container.innerHTML=
+      '<p style="text-align:center;font-size:18px">周期：'+c.arr.split('').join(' ') + ' （每'+c.len+'个一循环）</p>'+
+      '<p style="font-weight:700;text-align:center">第 <b style="color:#ff6b6b;font-size:22px">'+c.pos+'</b> 个是什么？</p>'+
+      '<div class="item-grid">'+c.arr.split('').map(ch=>'<div class="item-chip" onclick="GAMES.cycle.choose(\''+ch+'\',this)">'+ch+'</div>').join('')+'</div>'+
+      '<p class="feedback" id="cyfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  choose(ch,el){
+    const fb=document.getElementById('cyfb');
+    if(ch===gameState.cyAns){fb.textContent='✅ 正确！'+gameState.cyPos+'÷'+gameState.cyLen+'='+Math.floor(gameState.cyPos/gameState.cyLen)+'...'+((gameState.cyPos%gameState.cyLen)||gameState.cyLen);fb.className='feedback ok';el.classList.add('selected');setStars('cycle',2);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 用除法算算：'+gameState.cyPos+'÷'+gameState.cyLen+'=?';fb.className='feedback err';el.classList.add('wrong');setTimeout(()=>el.classList.remove('wrong'),500)}
+  },
+  stage3(container){ GAMES.cycle.stage2(container); }
+};
+
+// ==================== GAME 7: 和差问题 ====================
+GAMES.sumdiff = {
+  stage1(container){
+    const sum=20,diff=6;
+    const a=(sum+diff)/2, b=(sum-diff)/2;
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">已知两数之和为 <b>'+sum+'</b>，差为 <b>'+diff+'</b></p>'+
+      drawBarModel(a,b,'大数','小数',1,diff)+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">公式：(和+差)÷2 = 大数 = <b>'+(sum+diff)+'÷2 = '+a+'</b><br>(和-差)÷2 = 小数 = <b>'+(sum-diff)+'÷2 = '+b+'</b></p>';
+  },
+  stage2(container){
+    gameState.sdSum=genRandInt(16,40); gameState.sdDiff=genRandInt(2,Math.floor(gameState.sdSum/3));
+    if(gameState.sdDiff%2!==gameState.sdSum%2) gameState.sdDiff++; // ensure same parity for integer answers
+    const a=(gameState.sdSum+gameState.sdDiff)/2, b=(gameState.sdSum-gameState.sdDiff)/2;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整滑块，观察线段图的变化！</p>'+
+      '<div class="slider-grp"><label>和 (Sum)</label><span class="slider-val" id="sdSumV">'+gameState.sdSum+'</span><input type="range" id="sdSumS" min="10" max="60" value="'+gameState.sdSum+'" oninput="GAMES.sumdiff.update()"></div>'+
+      '<div class="slider-grp"><label>差 (Diff)</label><span class="slider-val" id="sdDiffV">'+gameState.sdDiff+'</span><input type="range" id="sdDiffS" min="1" max="'+Math.floor(gameState.sdSum/2)+'" value="'+gameState.sdDiff+'" oninput="GAMES.sumdiff.update()"></div>'+
+      '<div id="sdBar"></div>';
+    GAMES.sumdiff.update();
+  },
+  update(){
+    const sum=parseInt(document.getElementById('sdSumS').value);
+    const diff=parseInt(document.getElementById('sdDiffS').value);
+    document.getElementById('sdSumV').textContent=sum;
+    document.getElementById('sdDiffV').textContent=diff;
+    document.getElementById('sdDiffS').max=Math.floor(sum/2);
+    const a=(sum+diff)/2, b=(sum-diff)/2;
+    document.getElementById('sdBar').innerHTML=drawBarModel(a,b,'大数','小数',1,diff);
+  },
+  stage3(container){
+    let sum=genRandInt(20,50);let diff=genRandInt(2,Math.floor(sum/3));
+    if(diff%2!==sum%2) diff++; // ensure same parity for integer answers
+    gameState.sdAnsA=(sum+diff)/2;gameState.sdAnsB=(sum-diff)/2;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">两数之和='+sum+'，两数之差='+diff+'，求两数</p>'+
+      '<div class="answer-row"><span>大数=</span><input class="answer-input" id="sdA"><span>小数=</span><input class="answer-input" id="sdB"><button class="btn btn-p" onclick="GAMES.sumdiff.check()">确认</button></div>'+
+      '<p class="feedback" id="sdfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const a=parseInt(document.getElementById('sdA').value);const b=parseInt(document.getElementById('sdB').value);
+    const fb=document.getElementById('sdfb');
+    if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
+    if(a===gameState.sdAnsA&&b===gameState.sdAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('sumdiff',3);celebrate();updateStarTotal()}
+    else if(a===gameState.sdAnsA){fb.textContent='大数对了！小数=(和-差)÷2';fb.className='feedback err'}
+    else if(b===gameState.sdAnsB){fb.textContent='小数对了！大数=(和+差)÷2';fb.className='feedback err'}
+    else{fb.textContent='再想想公式：(和±差)÷2';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 8: 和倍问题 ====================
+GAMES.summulti = {
+  stage1(container){
+    const b=8,mult=3,sum=b+mult*b;
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">已知两数之和='+sum+'，大数是小数的'+mult+'倍</p>'+
+      drawBarModel(mult*b,b,'大数','小数',mult,sum-b)+
+      '<p style="text-align:center;font-size:14px;margin-top:10px">小数 = 和÷(倍数+1) = '+sum+'÷'+(mult+1)+' = <b>'+b+'</b><br>大数 = 小数×倍数 = '+b+'×'+mult+' = <b>'+(mult*b)+'</b></p>';
+  },
+  stage2(container){
+    gameState.smB=genRandInt(4,15);gameState.smMult=genRandInt(2,4);
+    const sum=gameState.smB*(gameState.smMult+1);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整倍数，观察变化！</p>'+
+      '<div class="slider-grp"><label>倍数</label><span class="slider-val" id="smMultV">'+gameState.smMult+'倍</span><input type="range" id="smMultS" min="2" max="5" value="'+gameState.smMult+'" oninput="GAMES.summulti.update()"></div>'+
+      '<div class="slider-grp"><label>小数</label><span class="slider-val" id="smBV">'+gameState.smB+'</span><input type="range" id="smBS" min="3" max="20" value="'+gameState.smB+'" oninput="GAMES.summulti.update()"></div>'+
+      '<p style="text-align:center">和 = <b id="smSumV">'+sum+'</b></p><div id="smBar"></div>';
+    GAMES.summulti.update();
+  },
+  update(){
+    const mult=parseInt(document.getElementById('smMultS').value);
+    const b=parseInt(document.getElementById('smBS').value);
+    document.getElementById('smMultV').textContent=mult+'倍';
+    document.getElementById('smBV').textContent=b;
+    document.getElementById('smSumV').textContent=b*(mult+1);
+    document.getElementById('smBar').innerHTML=drawBarModel(b*mult,b,'大数','小数',mult,b*(mult-1));
+  },
+  stage3(container){
+    const b=genRandInt(3,15);const mult=genRandInt(2,5);
+    gameState.smAnsB=b;gameState.smAnsA=b*mult;gameState.smSum=b*(mult+1);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">两数之和='+gameState.smSum+'，大数是小数的'+mult+'倍，求两数</p>'+
+      '<div class="answer-row"><span>小数=</span><input class="answer-input" id="smB"><span>大数=</span><input class="answer-input" id="smA"><button class="btn btn-p" onclick="GAMES.summulti.check()">确认</button></div>'+
+      '<p class="feedback" id="smfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const a=parseInt(document.getElementById('smA').value);const b=parseInt(document.getElementById('smB').value);
+    const fb=document.getElementById('smfb');
+    if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
+    if(a===gameState.smAnsA&&b===gameState.smAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('summulti',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 小数=和÷(倍数+1)='+gameState.smSum+'÷'+(gameState.smAnsA/gameState.smAnsB+1);fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 9: 差倍问题 ====================
+GAMES.diffmulti = {
+  stage1(container){
+    const b=5,mult=3; const diff=b*(mult-1);
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">已知两数之差='+diff+'，大数是小数的'+mult+'倍</p>'+
+      drawBarModel(mult*b,b,'大数','小数',mult,diff)+
+      '<p style="text-align:center;font-size:14px;margin-top:10px">小数 = 差÷(倍数-1) = '+diff+'÷'+(mult-1)+' = <b>'+b+'</b><br>大数 = 小数×倍数 = '+b+'×'+mult+' = <b>'+(mult*b)+'</b></p>';
+  },
+  stage2(container){
+    gameState.dmB=genRandInt(3,12);gameState.dmMult=genRandInt(2,5);
+    GAMES.diffmulti.renderDM();
+  },
+  renderDM(){
+    const b=gameState.dmB,mult=gameState.dmMult,diff=b*(mult-1);
+    const container=document.getElementById('stageContent');
+    let h='<p style="text-align:center;font-weight:700">调整倍数和差，观察线段图的变化</p>';
+    h+='<div class="slider-grp"><label>倍数</label><span class="slider-val" id="dmMultV">'+mult+'倍</span><input type="range" id="dmMultS" min="2" max="5" value="'+mult+'" oninput="GAMES.diffmulti.updateDM()"></div>';
+    h+='<div class="slider-grp"><label>小数</label><span class="slider-val" id="dmBV">'+b+'</span><input type="range" id="dmBS" min="2" max="20" value="'+b+'" oninput="GAMES.diffmulti.updateDM()"></div>';
+    h+='<p style="text-align:center">差 = <b id="dmDiffV">'+diff+'</b></p><div id="dmBar">'+drawBarModel(b*mult,b,'大数','小数',mult,diff)+'</div>';
+    container.innerHTML=h;
+  },
+  updateDM(){
+    gameState.dmB=parseInt(document.getElementById('dmBS').value);
+    gameState.dmMult=parseInt(document.getElementById('dmMultS').value);
+    document.getElementById('dmMultV').textContent=gameState.dmMult+'倍';
+    document.getElementById('dmBV').textContent=gameState.dmB;
+    const diff=gameState.dmB*(gameState.dmMult-1);
+    document.getElementById('dmDiffV').textContent=diff;
+    document.getElementById('dmBar').innerHTML=drawBarModel(gameState.dmB*gameState.dmMult,gameState.dmB,'大数','小数',gameState.dmMult,diff);
+  },
+  stage3(container){
+    const b=genRandInt(3,12);const mult=genRandInt(2,5);
+    gameState.dmAnsB=b;gameState.dmAnsA=b*mult;gameState.dmDiff=b*(mult-1);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">两数之差='+gameState.dmDiff+'，大数是小数的'+mult+'倍，求两数</p>'+
+      '<div class="answer-row"><span>小数=</span><input class="answer-input" id="dmB"><span>大数=</span><input class="answer-input" id="dmA"><button class="btn btn-p" onclick="GAMES.diffmulti.check()">确认</button></div>'+
+      '<p class="feedback" id="dmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const a=parseInt(document.getElementById('dmA').value);const b=parseInt(document.getElementById('dmB').value);
+    const fb=document.getElementById('dmfb');
+    if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
+    if(a===gameState.dmAnsA&&b===gameState.dmAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('diffmulti',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 小数=差÷(倍数-1)='+gameState.dmDiff+'÷'+(gameState.dmAnsA/gameState.dmAnsB-1);fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 10: 移多补少 ====================
+GAMES.balance = {
+  stage1(container){
+    gameState.blA=8;gameState.blB=2;
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">左边有<b>8</b>个⭐，右边有<b>2</b>个⭐<br>移动几个才能两边一样多？</p>'+
+      '<div style="display:flex;justify-content:space-around;width:100%;max-width:400px"><div id="blLeft" style="text-align:center;font-size:28px"></div><div style="font-size:40px">⚖️</div><div id="blRight" style="text-align:center;font-size:28px"></div></div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">多出: 8-2=6个 → 分一半: 6÷2=<b>3</b>个<br>移动3个就一样多了！（两边各5个）</p>';
+    GAMES.balance.renderBL();
+  },
+  renderBL(){document.getElementById('blLeft').innerHTML='⭐'.repeat(gameState.blA);document.getElementById('blRight').innerHTML='⭐'.repeat(gameState.blB);},
+  stage2(container){
+    const a=genRandInt(6,12);const diff=genRandInt(1,Math.floor((a-1)/2))*2;const b=a-diff;
+    gameState.blA=a;gameState.blB=b;gameState.blAns=(a-b)/2;
+    container.innerHTML=
+      '<p style="text-align:center"><b>'+gameState.blA+'</b>个⭐ vs <b>'+gameState.blB+'</b>个⭐</p>'+
+      '<div style="display:flex;justify-content:space-around;width:100%;max-width:400px"><div id="blLeft" style="text-align:center;font-size:28px;cursor:pointer" onclick="GAMES.balance.moveLeft()"></div><div style="font-size:40px">→</div><div id="blRight" style="text-align:center;font-size:28px;cursor:pointer" onclick="GAMES.balance.moveRight()"></div></div>'+
+      '<p style="font-size:13px;color:#adb5bd">点击左边减少，点击右边增加，让两边相等</p>'+
+      '<p id="blCount" style="font-weight:700">已移动: 0 个</p><p class="feedback" id="blfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 重置</button>';
+    GAMES.balance.renderBL2();
+    gameState.blMoved=0;
+  },
+  renderBL2(){document.getElementById('blLeft').innerHTML='⭐'.repeat(gameState.blA);document.getElementById('blRight').innerHTML='⭐'.repeat(gameState.blB);},
+  moveLeft(){
+    if(gameState.blA<=gameState.blB||gameState.blA<=1)return;
+    gameState.blA--;gameState.blB++;gameState.blMoved++;
+    GAMES.balance.renderBL2();GAMES.balance.checkBL();
+  },
+  moveRight(){
+    if(gameState.blB<=gameState.blA||gameState.blB<=1)return;
+    gameState.blB--;gameState.blA++;gameState.blMoved++;
+    GAMES.balance.renderBL2();GAMES.balance.checkBL();
+  },
+  checkBL(){
+    document.getElementById('blCount').textContent='已移动: '+gameState.blMoved+' 个';
+    if(gameState.blA===gameState.blB){
+      const fb=document.getElementById('blfb');
+      if(gameState.blMoved===gameState.blAns){fb.textContent='✅ 完美！正好移动了'+gameState.blMoved+'个';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal()}
+      else{fb.textContent='✅ 两边相等了！但可以移得更少（最优：'+gameState.blAns+'个）';fb.className='feedback ok'}
+    }
+  },
+  stage3(container){
+    const a=genRandInt(8,20);const diff=genRandInt(1,Math.floor((a-1)/2))*2;const b=a-diff;
+    gameState.blAns3=(a-b)/2;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">左边'+a+'个，右边'+b+'个，移动几个使两边相等？</p>'+
+      '<div class="answer-row"><span>移动</span><input class="answer-input" id="blAns"><span>个</span><button class="btn btn-p" onclick="GAMES.balance.check3()">确认</button></div>'+
+      '<p class="feedback" id="blfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('blAns').value);
+    const fb=document.getElementById('blfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.blAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 移动数=(多出的)÷2';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 11: 鸡兔同笼 ====================
+GAMES.chickenrabbit = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">笼子里有鸡🐔和兔🐰，共<b>5个头，14条腿</b></p>'+
+      '<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:40px">'+
+      '<span>🐔×3</span><span>🐰×2</span>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">鸡腿: 3×2=6 &nbsp; 兔腿: 2×4=8 &nbsp; 共: 6+8=<b>14</b> ✅<br>假设全是鸡: 5×2=10条腿，少了4条<br>每换1只兔增加2条腿 → 4÷2=<b>2只兔</b>，3只鸡</p>';
+  },
+  stage2(container){
+    gameState.crHeads=genRandInt(5,10);gameState.crLegs=gameState.crHeads*2+genRandInt(1,gameState.crHeads-1)*2;
+    gameState.crRabbits=(gameState.crLegs-gameState.crHeads*2)/2;
+    gameState.crChickens=gameState.crHeads-gameState.crRabbits;
+    gameState.crCurChickens=gameState.crHeads;gameState.crCurRabbits=0;
+    gameState.crCurLegs=gameState.crHeads*2;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">共<b>'+gameState.crHeads+'</b>个头，<b>'+gameState.crLegs+'</b>条腿</p>'+
+      '<div style="display:flex;gap:24px;justify-content:center;font-size:30px;align-items:center">'+
+      '<div style="text-align:center"><div id="crChickens"></div><div style="font-size:13px">鸡 (<span id="crCC">'+gameState.crChickens+'</span>只)</div></div>'+
+      '<div style="text-align:center"><div id="crRabbits"></div><div style="font-size:13px">兔 (<span id="crRC">0</span>只)</div></div>'+
+      '</div>'+
+      '<p>当前腿数: <b id="crLegCount">'+gameState.crCurLegs+'</b> / 目标: <b>'+gameState.crLegs+'</b></p>'+
+      '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="GAMES.chickenrabbit.swapToRabbit()">🐔→🐰 换一只</button><button class="btn btn-s" onclick="GAMES.chickenrabbit.swapToChicken()">🐰→🐔 换一只</button></div>'+
+      '<p class="feedback" id="crfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 重置</button>';
+    GAMES.chickenrabbit.renderCR();
+  },
+  renderCR(){
+    document.getElementById('crChickens').textContent='🐔'.repeat(gameState.crCurChickens);
+    document.getElementById('crRabbits').textContent='🐰'.repeat(gameState.crCurRabbits);
+    document.getElementById('crCC').textContent=gameState.crCurChickens;
+    document.getElementById('crRC').textContent=gameState.crCurRabbits;
+    document.getElementById('crLegCount').textContent=gameState.crCurLegs;
+  },
+  swapToRabbit(){
+    if(gameState.crCurChickens<=0)return;
+    gameState.crCurChickens--;gameState.crCurRabbits++;
+    gameState.crCurLegs=gameState.crCurChickens*2+gameState.crCurRabbits*4;
+    GAMES.chickenrabbit.renderCR();
+    GAMES.chickenrabbit.checkCR();
+  },
+  swapToChicken(){
+    if(gameState.crCurRabbits<=0)return;
+    gameState.crCurRabbits--;gameState.crCurChickens++;
+    gameState.crCurLegs=gameState.crCurChickens*2+gameState.crCurRabbits*4;
+    GAMES.chickenrabbit.renderCR();
+    GAMES.chickenrabbit.checkCR();
+  },
+  checkCR(){
+    if(gameState.crCurLegs===gameState.crLegs){
+      const fb=document.getElementById('crfb');
+      fb.textContent='🎉 腿数对了！鸡='+gameState.crCurChickens+'只，兔='+gameState.crCurRabbits+'只';
+      fb.className='feedback ok';setStars('chickenrabbit',2);celebrate();updateStarTotal();
+    }
+  },
+  stage3(container){
+    const heads=genRandInt(6,15);const rabbits=genRandInt(1,heads-1);
+    const chickens=heads-rabbits; const legs=chickens*2+rabbits*4;
+    gameState.crAnsC=chickens;gameState.crAnsR=rabbits;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">共'+heads+'头，'+legs+'腿，鸡和兔各几只？</p>'+
+      '<div class="answer-row"><span>🐔鸡</span><input class="answer-input" id="crAC"><span>只</span><span>🐰兔</span><input class="answer-input" id="crAR"><span>只</span><button class="btn btn-p" onclick="GAMES.chickenrabbit.check3()">确认</button></div>'+
+      '<p class="feedback" id="crfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const c=parseInt(document.getElementById('crAC').value);const r=parseInt(document.getElementById('crAR').value);
+    const fb=document.getElementById('crfb3');
+    if(isNaN(c)||isNaN(r)){fb.textContent='请填写完整';return}
+    if(c===gameState.crAnsC&&r===gameState.crAnsR){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('chickenrabbit',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 假设全是鸡：腿少了…每换1只兔+2腿';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 12: 盈亏问题 ====================
+GAMES.profitloss = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">老师分糖果🍬<br>每人分5颗 → 少3颗（亏）<br>每人分3颗 → 多7颗（盈）<br><br>人数 = (盈+亏)÷(分法差) = (7+3)÷(5-3) = <b>5人</b><br>糖果 = 5×5-3 = <b>22颗</b></p>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:20px">'+'🧑‍🎓'.repeat(5)+'</div>'+
+      '<p style="text-align:center;font-size:13px;color:#adb5bd">5个小朋友，22颗糖 ✅</p>';
+  },
+  stage2(container){
+    const people=genRandInt(4,8);
+    const perA=genRandInt(3,7);const perB=perA-genRandInt(2,Math.min(4,perA-1)); // perB >= 1
+    const candies=people*perA-genRandInt(1,perA-1);
+    gameState.plPeople=people;gameState.plCandies=candies;gameState.plPerA=perA;gameState.plPerB=perB;
+    const surplusA=candies-people*perA; // negative = loss
+    const surplusB=candies-people*perB; // positive = surplus
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">分糖果🍬</p>'+
+      '<div class="slider-grp"><label>每人分几个(方案1)</label><span class="slider-val" id="plPerAV">'+perA+'个</span><input type="range" id="plPerAS" min="2" max="10" value="'+perA+'" oninput="GAMES.profitloss.update()"></div>'+
+      '<div class="slider-grp"><label>每人分几个(方案2)</label><span class="slider-val" id="plPerBV">'+perB+'个</span><input type="range" id="plPerBS" min="1" max="8" value="'+perB+'" oninput="GAMES.profitloss.update()"></div>'+
+      '<div id="plViz" style="text-align:center;font-size:36px"></div><p id="plInfo" style="text-align:center;font-weight:600"></p><p class="feedback" id="plfb"></p>';
+    GAMES.profitloss.update();
+  },
+  update(){
+    const pA=parseInt(document.getElementById('plPerAS').value);
+    const pB=parseInt(document.getElementById('plPerBS').value);
+    document.getElementById('plPerAV').textContent=pA+'个';
+    document.getElementById('plPerBV').textContent=pB+'个';
+    const needA=gameState.plPeople*pA;
+    const needB=gameState.plPeople*pB;
+    const diffA=gameState.plCandies-needA; // negative=缺
+    const diffB=gameState.plCandies-needB;
+    document.getElementById('plViz').innerHTML='🧑‍🎓'.repeat(gameState.plPeople)+'<br><span style="font-size:13px">'+gameState.plPeople+'人，共'+gameState.plCandies+'颗糖</span>';
+    document.getElementById('plInfo').innerHTML='方案1 ('+pA+'个/人): 需要'+needA+'颗 → '+(diffA>=0?'多'+diffA:'少'+(-diffA))+'颗<br>方案2 ('+pB+'个/人): 需要'+needB+'颗 → '+(diffB>=0?'多'+diffB:'少'+(-diffB))+'颗';
+    const fb=document.getElementById('plfb');
+    if(diffA===0||diffB===0){fb.textContent='🎉 刚好分完！';fb.className='feedback ok'}
+    else if(diffA===diffB){fb.textContent='✅ 两种方案结果相同';fb.className='feedback ok'}
+  },
+  stage3(container){
+    const people=genRandInt(4,10);
+    const perA=genRandInt(2,4);                // 方案1：每人分几个
+    const perB=genRandInt(perA+1,perA+4);      // 方案2：每人分几个（比方案1多）
+    // candies between perA*people+1 and perB*people-1, so 方案1盈、方案2亏
+    const minC=people*perA+1;
+    const maxC=people*perB-1;
+    const candies=genRandInt(minC,maxC);
+    const surplus=candies-people*perA;          // >0, 盈
+    const shortage=people*perB-candies;         // >0, 亏
+    gameState.plAns=people;
+    gameState.plPerA=perA; gameState.plPerB=perB;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">每人分'+perA+'颗→多'+surplus+'颗；每人分'+perB+'颗→少'+shortage+'颗。有几人？</p>'+
+      '<p style="font-size:13px;color:#adb5bd">盈='+surplus+' 亏='+shortage+' 分法差='+(perB-perA)+'</p>'+
+      '<div class="answer-row"><span>人数=</span><input class="answer-input" id="plAns"><button class="btn btn-p" onclick="GAMES.profitloss.check3()">确认</button></div>'+
+      '<p class="feedback" id="plfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('plAns').value);
+    const fb=document.getElementById('plfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.plAns){fb.textContent='✅ 正确！人数=(盈+亏)÷分法差';fb.className='feedback ok';setStars('profitloss',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：(盈+亏)÷(分法之差)';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 13: 年龄问题 ====================
+GAMES.age = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px"><b>年龄差永远不变！</b></p>'+
+      '<div style="text-align:center;font-size:14px;line-height:2">'+
+      '今年：爸爸 35岁，小明 8岁 → 差 27岁<br>'+
+      '3年后：爸爸 38岁，小明 11岁 → 差 27岁<br>'+
+      '10年前：爸爸 25岁，小明 -2(还没出生呢) → 差 27岁<br>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:15px;color:#495057;margin-top:10px">无论过去还是未来，年龄差不变！</p>';
+  },
+  stage2(container){
+    const dad=genRandInt(28,40);const kid=genRandInt(4,10);
+    gameState.ageDad=dad;gameState.ageKid=kid;gameState.ageYear=0;
+    GAMES.age.renderAge();
+  },
+  renderAge(){
+    const container=document.getElementById('stageContent');
+    const dad=gameState.ageDad+gameState.ageYear; const kid=gameState.ageKid+gameState.ageYear;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">年龄差永远不变</p>'+
+      '<div class="slider-grp"><label>时间穿越 (±20年)</label><span class="slider-val" id="ageYV">'+(gameState.ageYear>=0?'+':'')+gameState.ageYear+'年</span><input type="range" id="ageYS" min="-15" max="15" value="'+gameState.ageYear+'" oninput="GAMES.age.slide()"></div>'+
+      '<div style="display:flex;gap:20px;justify-content:center;align-items:flex-end">'+
+      '<div style="text-align:center"><div style="font-size:50px">👨</div><div style="font-weight:700">爸爸: <b style="color:#ff6b6b;font-size:22px">'+dad+'</b>岁</div></div>'+
+      '<div style="text-align:center"><div style="font-size:50px">👦</div><div style="font-weight:700">小明: <b style="color:#4ecdc4;font-size:22px">'+kid+'</b>岁</div></div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:18px;background:#f8f9fa;padding:8px 16px;border-radius:12px">年龄差 = '+dad+' - '+kid+' = <b style="color:#ff6b6b">'+(dad-kid)+'</b> 岁（不变！）</p>';
+    document.getElementById('ageYV').textContent=(gameState.ageYear>=0?'+':'')+gameState.ageYear+'年';
+  },
+  slide(){
+    gameState.ageYear=parseInt(document.getElementById('ageYS').value);
+    GAMES.age.renderAge();
+  },
+  stage3(container){
+    const mult=genRandInt(3,5);
+    const kid=genRandInt(6,14);             // 先确定小明的年龄
+    const dad=kid*mult;                     // 爸爸 = 小明×倍数
+    const diff=dad-kid;                     // 年龄差永远是整数
+    gameState.ageAnsK=kid;gameState.ageAnsD=dad;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">爸爸年龄是小明的'+mult+'倍，爸爸比小明大'+diff+'岁。两人各几岁？</p>'+
+      '<div class="answer-row"><span>小明</span><input class="answer-input" id="ageK"><span>岁</span><span>爸爸</span><input class="answer-input" id="ageD"><span>岁</span><button class="btn btn-p" onclick="GAMES.age.check()">确认</button></div>'+
+      '<p class="feedback" id="agefb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const k=parseInt(document.getElementById('ageK').value);const d=parseInt(document.getElementById('ageD').value);
+    const fb=document.getElementById('agefb');
+    if(isNaN(k)||isNaN(d)){fb.textContent='请填写完整';return}
+    if(k===gameState.ageAnsK&&d===gameState.ageAnsD){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 年龄差不变，用差倍公式';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 14: 植树问题 ====================
+GAMES.tree = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">在一条路上种树🌳<br><br>一端种一端不种：树数 = 段数<br>两端都种：树数 = 段数 + 1<br>两端都不种：树数 = 段数 - 1<br>圆形：树数 = 段数</p>'+
+      '<div class="tree-row" id="treeDemo" style="justify-content:center"></div>';
+    const trees=5;
+    let th='';for(let i=0;i<trees;i++) th+='<span class="tree">🌳</span><span class="tree-spacer"></span>';
+    document.getElementById('treeDemo').innerHTML=th+'<p style="font-size:13px;color:#adb5bd;margin-top:8px">两端都种：5棵树，4段</p>';
+  },
+  stage2(container){
+    gameState.trLength=20;gameState.trInterval=5;gameState.trMode='both';
+    GAMES.tree.renderTR();
+  },
+  renderTR(){
+    const container=document.getElementById('stageContent');
+    const length=gameState.trLength;const interval=gameState.trInterval;
+    const segments=Math.floor(length/interval);
+    let trees=(gameState.trMode==='both')?segments+1:(gameState.trMode==='none')?segments-1:segments;
+    trees=Math.max(0,trees);
+    let h='<p style="text-align:center;font-weight:700">路长 <b style="color:#ff6b6b">'+length+'</b>米，间隔 <b style="color:#4ecdc4">'+interval+'</b>米</p>';
+    h+='<div class="slider-grp"><label>路长(米)</label><span class="slider-val">'+length+'米</span><input type="range" id="trLenS" min="10" max="50" value="'+length+'" oninput="GAMES.tree.updateTR()"></div>';
+    h+='<div class="slider-grp"><label>间隔(米)</label><span class="slider-val">'+interval+'米</span><input type="range" id="trIntS" min="1" max="10" value="'+interval+'" oninput="GAMES.tree.updateTR()"></div>';
+    h+='<div class="item-grid"><span>种植方式：</span>';
+    ['both','none','one','circle'].forEach(m=>{
+      const names={both:'两端都种',none:'两端不种',one:'只种一端',circle:'圆形'};
+      h+='<div class="item-chip'+(gameState.trMode===m?' selected':'')+'" onclick="GAMES.tree.setMode(\''+m+'\')">'+names[m]+'</div>';
+    });
+    h+='</div>';
+    h+='<div class="tree-row" style="justify-content:center">';
+    for(let i=0;i<trees;i++) h+='<span class="tree">🌳</span>'+(i<trees-1?'<span class="tree-spacer" style="width:'+(interval*3)+'px"></span>':'');
+    h+='</div>';
+    h+='<p style="text-align:center;font-weight:700;font-size:16px">段数='+segments+'，树数=<b style="color:#ff6b6b">'+trees+'</b>棵</p>';
+    container.innerHTML=h;
+  },
+  updateTR(){
+    gameState.trLength=parseInt(document.getElementById('trLenS').value);
+    gameState.trInterval=parseInt(document.getElementById('trIntS').value);
+    GAMES.tree.renderTR();
+  },
+  setMode(m){gameState.trMode=m;GAMES.tree.renderTR();},
+  stage3(container){
+    const length=genRandInt(10,40);const interval=genRandInt(2,Math.min(8,length/2));
+    const segments=Math.floor(length/interval);
+    gameState.trAnsBoth=segments+1;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">路长'+length+'米，每'+interval+'米种一棵，两端都种，共几棵？</p>'+
+      '<div class="answer-row"><span>共种</span><input class="answer-input" id="trAns"><span>棵</span><button class="btn btn-p" onclick="GAMES.tree.check3()">确认</button></div>'+
+      '<p class="feedback" id="trfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('trAns').value);
+    const fb=document.getElementById('trfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.trAnsBoth){fb.textContent='✅ 正确！两端都种：段数+1';fb.className='feedback ok';setStars('tree',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 先算段数，再看两端';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 15: 容斥原理 ====================
+GAMES.venn = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">班级有20人，喜欢🍎的12人，喜欢🍌的15人，都喜欢的8人。<br>至少喜欢一种的有多少人？</p>'+
+      '<div style="text-align:center">'+makeVennSVG()+'</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057">公式：A∪B = A + B - A∩B = 12 + 15 - 8 = <b>19人</b></p>';
+  },
+  stage2(container){
+    gameState.vnA=genRandInt(8,18);gameState.vnB=genRandInt(8,18);
+    gameState.vnBoth=genRandInt(2,Math.min(gameState.vnA,gameState.vnB)-2);
+    GAMES.venn.renderVN();
+  },
+  renderVN(){
+    const container=document.getElementById('stageContent');
+    const a=gameState.vnA,b=gameState.vnB,both=gameState.vnBoth;
+    const onlyA=a-both,onlyB=b-both,union=onlyA+onlyB+both;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">喜欢🍎的'+a+'人，喜欢🍌的'+b+'人，都喜欢的'+both+'人</p>'+
+      makeVennSVG()+
+      '<div style="text-align:center;font-size:14px">'+
+      '<span style="color:#ff6b6b">● 只喜欢🍎: '+onlyA+'</span> &nbsp; '+
+      '<span style="color:#4ecdc4">● 只喜欢🍌: '+onlyB+'</span> &nbsp; '+
+      '<span style="color:#a29bfe">● 都喜欢: '+both+'</span>'+
+      '</div>'+
+      '<div class="answer-row"><span>至少喜欢一种:</span><input class="answer-input" id="vnAns"><button class="btn btn-p" onclick="GAMES.venn.check()">确认</button></div>'+
+      '<p class="feedback" id="vnfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    gameState.vnUnion=union;
+  },
+  check(){
+    const ans=parseInt(document.getElementById('vnAns').value);
+    const fb=document.getElementById('vnfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.vnUnion){fb.textContent='✅ 正确！A+B-都='+gameState.vnA+'+'+gameState.vnB+'-'+gameState.vnBoth+'='+gameState.vnUnion;fb.className='feedback ok';setStars('venn',2);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：A+B-都喜欢';fb.className='feedback err'}
+  },
+  stage3(container){ GAMES.venn.stage2(container); }
+};
+function makeVennSVG(){
+  return '<svg viewBox="0 0 300 160" width="280" height="150"><circle cx="110" cy="80" r="60" fill="rgba(255,107,107,.3)" stroke="#ff6b6b" stroke-width="2"/><circle cx="190" cy="80" r="60" fill="rgba(78,205,196,.3)" stroke="#4ecdc4" stroke-width="2"/><text x="70" y="70" font-size="14" fill="#ff6b6b" font-weight="700">🍎</text><text x="210" y="70" font-size="14" fill="#4ecdc4" font-weight="700">🍌</text><text x="145" y="85" font-size="13" fill="#a29bfe" font-weight="700">都喜欢</text></svg>';
+}
+
+// ==================== GAME 16: 抽屉原理 ====================
+GAMES.pigeonhole = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">把4个🍎放进3个抽屉<br>不管怎么放，<b>至少有一个抽屉里有2个或更多</b></p>'+
+      '<div style="display:flex;gap:12px;justify-content:center;font-size:40px">'+
+      '<div style="background:#f8f9fa;padding:12px;border-radius:12px;text-align:center">📦<br><span style="font-size:12px">抽屉1</span></div>'+
+      '<div style="background:#f8f9fa;padding:12px;border-radius:12px;text-align:center">📦<br><span style="font-size:12px">抽屉2</span></div>'+
+      '<div style="background:#f8f9fa;padding:12px;border-radius:12px;text-align:center">📦<br><span style="font-size:12px">抽屉3</span></div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">最坏情况：每个抽屉放1个(3个)，第4个无论放哪都导致至少一个抽屉有2个</p>';
+  },
+  stage2(container){
+    gameState.phItems=genRandInt(4,10);gameState.phBoxes=genRandInt(2,4);
+    gameState.phInBoxes=Array(gameState.phBoxes).fill(0);
+    gameState.phRemaining=gameState.phItems;
+    GAMES.pigeonhole.renderPH();
+  },
+  renderPH(){
+    const container=document.getElementById('stageContent');
+    let h='<p style="text-align:center;font-weight:700">把<b>'+gameState.phItems+'</b>个物品放入<b>'+gameState.phBoxes+'</b>个抽屉</p>';
+    h+='<div style="display:flex;gap:10px;justify-content:center">';
+    for(let i=0;i<gameState.phBoxes;i++){
+      h+='<div style="background:#f8f9fa;padding:10px;border-radius:12px;text-align:center;cursor:pointer;min-width:60px" onclick="GAMES.pigeonhole.addTo('+i+')">📦<br><span style="font-size:22px">'+'🍎'.repeat(gameState.phInBoxes[i])+'</span><br><span style="font-size:12px">抽屉'+(i+1)+'('+gameState.phInBoxes[i]+'个)</span></div>';
+    }
+    h+='</div><p>剩余: <b>'+gameState.phRemaining+'</b>个🍎</p><p style="font-size:13px;color:#adb5bd">点击抽屉放入🍎</p>';
+    const maxInOne=Math.max(...gameState.phInBoxes);
+    h+='<p style="font-weight:700">最多的抽屉有: <b style="color:#ff6b6b">'+maxInOne+'</b>个</p>';
+    if(gameState.phRemaining===0){
+      h+='<p class="feedback ok">✅ 全部放完！至少有一个抽屉有'+maxInOne+'个。最坏情况：每个先放1个，剩余'+(gameState.phItems-gameState.phBoxes)+'个</p>';
+    }
+    h+='<button class="btn btn-o" onclick="renderGameStage()">🔄 重置</button>';
+    container.innerHTML=h;
+  },
+  addTo(i){
+    if(gameState.phRemaining<=0)return;
+    gameState.phInBoxes[i]++;gameState.phRemaining--;
+    GAMES.pigeonhole.renderPH();
+    if(gameState.phRemaining===0){setStars('pigeonhole',2);celebrate();updateStarTotal()}
+  },
+  stage3(container){
+    const items=genRandInt(5,15);const boxes=genRandInt(2,5);
+    gameState.phAns3=Math.floor((items-1)/boxes)+1;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">'+items+'个物品放入'+boxes+'个抽屉，至少有一个抽屉不少于几个？</p>'+
+      '<div class="answer-row"><span>不少于</span><input class="answer-input" id="phAns"><span>个</span><button class="btn btn-p" onclick="GAMES.pigeonhole.check3()">确认</button></div>'+
+      '<p class="feedback" id="phfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('phAns').value);
+    const fb=document.getElementById('phfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.phAns3){fb.textContent='✅ 正确！('+gameState.phItems+'-1)÷'+gameState.phBoxes+'+1 向上取整';fb.className='feedback ok';setStars('pigeonhole',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 考虑最坏情况：平均分配';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 17: 排队问题 ====================
+GAMES.queue = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">排队👫👫👫<br>小明从左数排第3，从右数排第4<br>一共有几人？</p>'+
+      '<div style="font-size:30px;text-align:center;letter-spacing:4px">👫👫🧑👫👫👫</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">3 + 4 - 1 = <b>6人</b><br>(左数+右数-自己)</p>';
+  },
+  stage2(container){
+    const total=genRandInt(5,12);const pos=genRandInt(2,total-1);
+    const fromLeft=pos;const fromRight=total-pos+1;
+    gameState.qTotal=total;gameState.qFromLeft=fromLeft;gameState.qFromRight=fromRight;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">小明从左数排第<b>'+fromLeft+'</b>，从右数排第<b>'+fromRight+'</b></p>'+
+      '<div style="font-size:24px;text-align:center;letter-spacing:2px">'+
+      Array.from({length:total},(_,i)=>'<span'+(i===pos-1?' style="font-size:36px"':'')+'>'+(i===pos-1?'🧑':'👫')+'</span>').join('')+
+      '</div>'+
+      '<p style="text-align:center">👈 左 &nbsp;&nbsp;&nbsp; 右 👉</p>'+
+      '<div class="answer-row"><span>一共</span><input class="answer-input" id="qAns"><span>人</span><button class="btn btn-p" onclick="GAMES.queue.check2()">确认</button></div>'+
+      '<p class="feedback" id="qfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    gameState.qAns2=total;
+  },
+  check2(){
+    const ans=parseInt(document.getElementById('qAns').value);
+    const fb=document.getElementById('qfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.qAns2){fb.textContent='✅ 正确！'+gameState.qFromLeft+'+'+gameState.qFromRight+'-1='+gameState.qAns2;fb.className='feedback ok';setStars('queue',2);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：左数+右数-1';fb.className='feedback err'}
+  },
+  stage3(container){
+    const total=genRandInt(6,15);const apos=genRandInt(2,total-3);const bpos=genRandInt(apos+1,total-1);
+    const between=bpos-apos-1;
+    gameState.qAnsB=between;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">'+total+'人排队，小明排第'+apos+'，小红排第'+bpos+'，两人之间隔几人？</p>'+
+      '<div class="answer-row"><span>隔了</span><input class="answer-input" id="qAnsB"><span>人</span><button class="btn btn-p" onclick="GAMES.queue.check3()">确认</button></div>'+
+      '<p class="feedback" id="qfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('qAnsB').value);
+    const fb=document.getElementById('qfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.qAnsB){fb.textContent='✅ 正确！中间隔了'+ans+'人';fb.className='feedback ok';setStars('queue',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ =后者的位置-前者的位置-1';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 18: 相遇问题 ====================
+GAMES.meeting = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">小明和小红从两地同时出发相向而行<br>距离300米，小明60米/分，小红40米/分</p>'+
+      '<div class="anim-track" style="height:60px"><span style="position:absolute;left:0;bottom:8px;font-size:30px">🧑</span><span style="position:absolute;right:0;bottom:8px;font-size:30px">👧</span></div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057;margin-top:10px">速度和 = 60+40 = 100米/分<br>相遇时间 = 300÷100 = <b>3分钟</b><br>小明走了: 60×3=180米，小红走了: 40×3=120米</p>';
+  },
+  stage2(container){
+    gameState.mtDist=genRandInt(200,600);const sA=genRandInt(30,80);const sB=genRandInt(30,80);
+    gameState.mtSA=sA;gameState.mtSB=sB;gameState.mtSumS=sA+sB;
+    gameState.mtTime=gameState.mtDist/gameState.mtSumS;
+    GAMES.meeting.renderMT();
+  },
+  renderMT(){
+    const container=document.getElementById('stageContent');
+    const dist=gameState.mtDist,sA=gameState.mtSA,sB=gameState.mtSB;
+    const time=dist/(sA+sB);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">距离<b>'+dist+'</b>米，A速度<b>'+sA+'</b>米/分，B速度<b>'+sB+'</b>米/分</p>'+
+      '<div class="slider-grp"><label>距离(米)</label><span class="slider-val">'+dist+'米</span><input type="range" id="mtDistS" min="100" max="800" value="'+dist+'" oninput="GAMES.meeting.updateMT()"></div>'+
+      '<div style="display:flex;gap:16px">'+
+      '<div class="slider-grp"><label>A速度</label><span class="slider-val">'+sA+'米/分</span><input type="range" id="mtSAS" min="20" max="100" value="'+sA+'" oninput="GAMES.meeting.updateMT()"></div>'+
+      '<div class="slider-grp"><label>B速度</label><span class="slider-val">'+sB+'米/分</span><input type="range" id="mtSBS" min="20" max="100" value="'+sB+'" oninput="GAMES.meeting.updateMT()"></div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:18px">相遇时间 = '+dist+'÷('+sA+'+'+sB+') = <b style="color:#ff6b6b">'+time.toFixed(1)+'</b> 分钟</p>'+
+      '<p style="text-align:center;font-size:14px;color:#adb5bd">A走了: '+sA+'×'+time.toFixed(1)+'='+(sA*time).toFixed(0)+'米 | B走了: '+sB+'×'+time.toFixed(1)+'='+(sB*time).toFixed(0)+'米</p>';
+  },
+  updateMT(){
+    gameState.mtDist=parseInt(document.getElementById('mtDistS').value);
+    gameState.mtSA=parseInt(document.getElementById('mtSAS').value);
+    gameState.mtSB=parseInt(document.getElementById('mtSBS').value);
+    gameState.mtSumS=gameState.mtSA+gameState.mtSB;
+    gameState.mtTime=gameState.mtDist/gameState.mtSumS;
+    GAMES.meeting.renderMT();
+  },
+  stage3(container){
+    const dist=genRandInt(200,600);const sA=genRandInt(30,80);const sB=genRandInt(30,80);
+    gameState.mtAns3=dist/(sA+sB);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">距离'+dist+'米，A速'+sA+'米/分，B速'+sB+'米/分，几分钟相遇？</p>'+
+      '<div class="answer-row"><span>相遇时间=</span><input class="answer-input" id="mtAns"><span>分钟</span><button class="btn btn-p" onclick="GAMES.meeting.check3()">确认</button></div>'+
+      '<p class="feedback" id="mtfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseFloat(document.getElementById('mtAns').value);
+    const fb=document.getElementById('mtfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(Math.abs(ans-gameState.mtAns3)<0.1){fb.textContent='✅ 正确！时间=距离÷速度和';fb.className='feedback ok';setStars('meeting',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：距离÷(速度A+速度B)';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 19: 追及问题 ====================
+GAMES.chase = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">小明先走100米，小红从后面追<br>小红80米/分，小明60米/分<br>多久能追上？</p>'+
+      '<p style="text-align:center;font-size:14px;color:#495057">速度差 = 80-60 = 20米/分<br>追及时间 = 100÷20 = <b>5分钟</b><br>小红走了: 80×5=400米</p>';
+  },
+  stage2(container){
+    gameState.chLead=genRandInt(50,300);gameState.chFast=genRandInt(60,100);gameState.chSlow=genRandInt(20,gameState.chFast-20);
+    GAMES.chase.renderCH();
+  },
+  renderCH(){
+    const container=document.getElementById('stageContent');
+    const lead=gameState.chLead,fast=gameState.chFast,slow=gameState.chSlow;
+    const time=lead/(fast-slow);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">领先<b>'+lead+'</b>米，快者<b>'+fast+'</b>米/分，慢者<b>'+slow+'</b>米/分</p>'+
+      '<div class="slider-grp"><label>领先距离</label><span class="slider-val">'+lead+'米</span><input type="range" id="chLeadS" min="20" max="500" value="'+lead+'" oninput="GAMES.chase.updateCH()"></div>'+
+      '<div style="display:flex;gap:16px">'+
+      '<div class="slider-grp"><label>快者速度</label><span class="slider-val">'+fast+'米/分</span><input type="range" id="chFastS" min="30" max="120" value="'+fast+'" oninput="GAMES.chase.updateCH()"></div>'+
+      '<div class="slider-grp"><label>慢者速度</label><span class="slider-val">'+slow+'米/分</span><input type="range" id="chSlowS" min="10" max="80" value="'+slow+'" oninput="GAMES.chase.updateCH()"></div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:18px">追及时间 = '+lead+'÷('+fast+'-'+slow+') = <b style="color:#ff6b6b">'+time.toFixed(1)+'</b> 分钟</p>';
+  },
+  updateCH(){
+    gameState.chLead=parseInt(document.getElementById('chLeadS').value);
+    gameState.chFast=parseInt(document.getElementById('chFastS').value);
+    gameState.chSlow=parseInt(document.getElementById('chSlowS').value);
+    if(gameState.chFast<=gameState.chSlow) gameState.chFast=gameState.chSlow+10;
+    GAMES.chase.renderCH();
+  },
+  stage3(container){
+    const lead=genRandInt(50,300);const fast=genRandInt(60,100);const slow=genRandInt(20,fast-20);
+    gameState.chAns3=lead/(fast-slow);
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">领先'+lead+'米，快者'+fast+'米/分，慢者'+slow+'米/分，几分钟追上？</p>'+
+      '<div class="answer-row"><span>追及时间=</span><input class="answer-input" id="chAns"><span>分钟</span><button class="btn btn-p" onclick="GAMES.chase.check3()">确认</button></div>'+
+      '<p class="feedback" id="chfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseFloat(document.getElementById('chAns').value);
+    const fb=document.getElementById('chfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(Math.abs(ans-gameState.chAns3)<0.1){fb.textContent='✅ 正确！时间=距离差÷速度差';fb.className='feedback ok';setStars('chase',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：领先距离÷(快-慢)';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 20: 平均数 ====================
+GAMES.average = {
+  stage1(container){
+    container.innerHTML=
+      '<p style="text-align:center;font-size:15px">小明成绩：语文90，数学96，英语87<br>平均分 = (90+96+87)÷3</p>'+
+      '<div style="display:flex;gap:6px;align-items:flex-end;justify-content:center;height:120px">'+
+      '<div style="width:40px;height:90px;background:#ff6b6b;border-radius:6px 6px 0 0;display:flex;align-items:flex-start;justify-content:center;color:#fff;font-weight:700">90</div>'+
+      '<div style="width:40px;height:96px;background:#4ecdc4;border-radius:6px 6px 0 0;display:flex;align-items:flex-start;justify-content:center;color:#fff;font-weight:700">96</div>'+
+      '<div style="width:40px;height:87px;background:#feca57;border-radius:6px 6px 0 0;display:flex;align-items:flex-start;justify-content:center;color:#fff;font-weight:700">87</div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:14px;color:#495057">平均分 = 273÷3 = <b>91分</b><br>平均数 = 总和÷个数</p>';
+  },
+  stage2(container){
+    const vals=[genRandInt(60,100),genRandInt(60,100),genRandInt(60,100),genRandInt(60,100)];
+    gameState.avVals=vals;gameState.avSum=vals.reduce((a,b)=>a+b,0);gameState.avAvg=gameState.avSum/vals.length;
+    GAMES.average.renderAV();
+  },
+  renderAV(){
+    const container=document.getElementById('stageContent');
+    const vals=gameState.avVals;
+    const sum=vals.reduce((a,b)=>a+b,0);const avg=sum/vals.length;
+    const maxH=Math.max(...vals);
+    let h='<p style="text-align:center;font-weight:700">调整数值，观察平均数变化</p>';
+    h+='<div style="display:flex;gap:8px;align-items:flex-end;justify-content:center;height:140px">';
+    vals.forEach((v,i)=>{
+      const hPx=(v/maxH)*100;
+      h+='<div style="text-align:center"><input type="number" class="answer-input" value="'+v+'" style="width:50px;margin-bottom:4px" onchange="GAMES.average.changeVal('+i+',this.value)" min="0" max="200"><div style="width:44px;height:'+hPx+'px;background:'+['#ff6b6b','#4ecdc4','#feca57','#a29bfe'][i]+';border-radius:6px 6px 0 0;margin:0 auto"></div></div>';
+    });
+    h+='</div>';
+    h+='<p style="text-align:center;font-size:18px;margin-top:12px">总和 = <b>'+sum+'</b> &nbsp; 平均数 = <b style="color:#ff6b6b">'+avg.toFixed(1)+'</b></p>';
+    h+='<p style="text-align:center;font-size:13px;color:#adb5bd">平均数 = 总和 ÷ '+vals.length+' = '+sum+'÷'+vals.length+' = '+avg.toFixed(1)+'</p>';
+    h+='<button class="btn btn-o" onclick="renderGameStage()">🔄 重置</button>';
+    container.innerHTML=h;
+  },
+  changeVal(i,newVal){
+    const v=parseInt(newVal);if(isNaN(v)||v<0)return;
+    gameState.avVals[i]=v;gameState.avSum=gameState.avVals.reduce((a,b)=>a+b,0);gameState.avAvg=gameState.avSum/gameState.avVals.length;
+    GAMES.average.renderAV();
+  },
+  stage3(container){
+    const vals=[genRandInt(60,100),genRandInt(60,100),genRandInt(60,100)];
+    const avg=vals.reduce((a,b)=>a+b,0)/3;
+    gameState.avAns3=Math.round(avg*10)/10;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">成绩：'+vals.join('分，')+'分。平均分是多少？</p>'+
+      '<div class="answer-row"><span>平均分=</span><input class="answer-input" id="avAns"><span>分</span><button class="btn btn-p" onclick="GAMES.average.check3()">确认</button></div>'+
+      '<p class="feedback" id="avfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseFloat(document.getElementById('avAns').value);
+    const fb=document.getElementById('avfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(Math.abs(ans-gameState.avAns3)<0.1){fb.textContent='✅ 正确！平均分='+gameState.avAns3;fb.className='feedback ok';setStars('average',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ (总和)÷个数';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 21: 归一问题 ====================
+GAMES.normalization = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px;line-height:2">🧮 <b>归一问题</b>：先求1份是多少<br><br>例：买3个笔袋花了<b>18元</b><br>1个笔袋：18÷3 = <b>6元</b><br>买5个：6×5 = <b>30元</b><br><br>📌 口诀：<b>先归一，再求多</b></p>';
+  },
+  stage2(container){
+    gameState.nmUnit=genRandInt(3,8);gameState.nmQty=genRandInt(2,5);
+    gameState.nmTotal=gameState.nmUnit*gameState.nmQty;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整单价和数量，观察总价变化</p>'+
+      '<div class="slider-grp"><label>单价(元/个)</label><span class="slider-val" id="nmUnitV">'+gameState.nmUnit+'</span><input type="range" id="nmUnitS" min="2" max="10" value="'+gameState.nmUnit+'" oninput="GAMES.normalization.upd()"></div>'+
+      '<div class="slider-grp"><label>数量(个)</label><span class="slider-val" id="nmQtyV">'+gameState.nmQty+'</span><input type="range" id="nmQtyS" min="1" max="8" value="'+gameState.nmQty+'" oninput="GAMES.normalization.upd()"></div>'+
+      '<p style="text-align:center;font-size:20px">总价 = <b style="color:#ff6b6b" id="nmTotalV">'+gameState.nmTotal+'</b> 元</p>'+
+      '<p style="font-size:13px;color:#adb5bd;text-align:center">单价×数量=总价 &nbsp;|&nbsp; 总价÷数量=单价 &nbsp;|&nbsp; 总价÷单价=数量</p>';
+  },
+  upd(){
+    gameState.nmUnit=parseInt(document.getElementById('nmUnitS').value);
+    gameState.nmQty=parseInt(document.getElementById('nmQtyS').value);
+    gameState.nmTotal=gameState.nmUnit*gameState.nmQty;
+    document.getElementById('nmUnitV').textContent=gameState.nmUnit;
+    document.getElementById('nmQtyV').textContent=gameState.nmQty;
+    document.getElementById('nmTotalV').textContent=gameState.nmTotal;
+  },
+  stage3(container){
+    const types=[
+      ()=>{const a=genRandInt(2,5),p=genRandInt(3,8),b=a*p,c=genRandInt(4,9);if(c===a)c++;return{q:'买'+a+'个同样的笔记本花了'+b+'元，买'+c+'个需要多少元？',ans:p*c};},
+      ()=>{const m=genRandInt(2,4),h=genRandInt(2,5),per=genRandInt(2,6),t=m*h*per;return{q:m+'台机器'+h+'小时生产'+t+'个零件，1台机器1小时生产几个？',ans:per};},
+      ()=>{const w=genRandInt(3,6),d=genRandInt(2,4),pu=genRandInt(2,5),r=w*d*pu,w2=genRandInt(3,8),d2=genRandInt(2,5);if(w2===w&&d2===d)d2++;return{q:w+'个工人'+d+'天修路'+r+'米，'+w2+'个工人'+d2+'天修多少米？',ans:w2*d2*pu};}
+    ];
+    const p=types[Math.floor(Math.random()*types.length)]();gameState.nmAns=p.ans;
+    container.innerHTML='<p style="text-align:center;font-weight:700">'+p.q+'</p><div class="answer-row"><input class="answer-input" id="nmAns" placeholder="?"><button class="btn btn-p" onclick="GAMES.normalization.check()">确认</button></div><p class="feedback" id="nmfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const ans=parseInt(document.getElementById('nmAns').value),fb=document.getElementById('nmfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.nmAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('normalization',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 先求1份的量（归一），再求多份';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 22: 还原问题 ====================
+GAMES.reverse = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px;line-height:2">↩️ <b>还原问题</b>：从结果倒推回去<br><br>例：一个数 <b>+5</b> → <b>×3</b> → <b>-4</b> 得到 <b>26</b><br><br>倒推：26 <b>+4</b> → 30 <b>÷3</b> → 10 <b>-5</b> → <b style="color:#ff6b6b">5</b><br><br>📌 口诀：<b>正向算，反向推；加减互换，乘除互换</b></p>';
+  },
+  stage2(container){
+    const x=genRandInt(2,9),a=genRandInt(2,8),b=genRandInt(2,4),c=genRandInt(3,Math.min(10,(x+a)*b-1));
+    const s1=x+a,s2=s1*b,r=s2-c;
+    gameState.rvX=x;gameState.rvA=a;gameState.rvB=b;gameState.rvC=c;gameState.rvR=r;
+    gameState.rvStep=0;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">一个数经过3步运算得到 <b style="color:#ff6b6b;font-size:22px">'+r+'</b></p>'+
+      '<div style="text-align:center;font-size:16px;line-height:2.2">? → <b style="color:#4ecdc4">+'+a+'</b> → <b style="color:#feca57">×'+b+'</b> → <b style="color:#fd79a8">-'+c+'</b> = '+r+'</div>'+
+      '<p style="text-align:center;font-size:14px;color:#636e72">点击按钮逐步倒推还原</p>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center" id="rvBtns">'+
+      '<button class="btn btn-p" onclick="GAMES.reverse.step(\'add\','+c+')">① 先 +'+c+'（减变加）</button>'+
+      '<button class="btn btn-s" onclick="GAMES.reverse.step(\'div\','+b+')">② 再 ÷'+b+'（乘变除）</button>'+
+      '<button class="btn btn-o" onclick="GAMES.reverse.step(\'sub\','+a+')">③ 最后 -'+a+'（加变减）</button></div>'+
+      '<p class="feedback" id="rvfb">当前值: <b>'+r+'</b>（从结果开始）</p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+    gameState.rvCur=r;
+  },
+  step(op,val){
+    const fb=document.getElementById('rvfb');
+    const btns=document.getElementById('rvBtns');
+    if(op==='add'&&gameState.rvStep===0){gameState.rvCur+=val;gameState.rvStep++;fb.innerHTML='当前值: <b>'+gameState.rvCur+'</b>（+'+val+'后）';btns.children[0].disabled=true;}
+    else if(op==='div'&&gameState.rvStep===1){gameState.rvCur/=val;gameState.rvStep++;fb.innerHTML='当前值: <b>'+gameState.rvCur+'</b>（÷'+val+'后）';btns.children[1].disabled=true;}
+    else if(op==='sub'&&gameState.rvStep===2){gameState.rvCur-=val;gameState.rvStep++;fb.innerHTML='当前值: <b>'+gameState.rvCur+'</b>（-'+val+'后）';btns.children[2].disabled=true;}
+    if(gameState.rvStep===3){
+      if(gameState.rvCur===gameState.rvX){fb.innerHTML='🎉 还原成功！原来的数是 <b style="color:#ff6b6b;font-size:20px">'+gameState.rvX+'</b>';fb.className='feedback ok';setStars('reverse',2);celebrate();updateStarTotal()}
+      else{fb.innerHTML='❌ 结果不对，你再检查一下步骤顺序';fb.className='feedback err'}
+    }
+  },
+  stage3(container){
+    const x=genRandInt(2,9),a=genRandInt(2,8),b=genRandInt(2,4),c=genRandInt(3,Math.min(10,(x+a)*b-1));
+    const r=(x+a)*b-c; // forward: +a, ×b, -c → guaranteed positive
+    gameState.rvAns3=x;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">一个数 <b>+'+a+'</b> → <b>×'+b+'</b> → <b>-'+c+'</b> = <b style="color:#ff6b6b">'+r+'</b>，原来是多少？</p>'+
+      '<div class="answer-row"><span>原来的数=</span><input class="answer-input" id="rvAns"><button class="btn btn-p" onclick="GAMES.reverse.check3()">确认</button></div>'+
+      '<p class="feedback" id="rvfb3"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const ans=parseInt(document.getElementById('rvAns').value),fb=document.getElementById('rvfb3');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.rvAns3){fb.textContent='✅ 正确！倒推：(结果+c)÷b-a';fb.className='feedback ok';setStars('reverse',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 从结果倒推：(R+'+gameState.rvC+')÷'+gameState.rvB+'-'+gameState.rvA;fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 23: 工程问题 ====================
+GAMES.work = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px;line-height:2">🔧 <b>工程问题</b>：工作效率×时间=工作量<br><br>例：甲单独做需<b>10天</b>，乙单独做需<b>15天</b><br>甲每天做 1/10，乙每天做 1/15<br>合作每天做 1/10+1/15 = 3/30+2/30 = <b>5/30 = 1/6</b><br>合作完成：1÷(1/6) = <b>6天</b><br><br>📌 公式：<b>1÷(1/T₁+1/T₂)</b></p>';
+  },
+  stage2(container){
+    gameState.wkT1=genRandInt(4,12);gameState.wkT2=gameState.wkT1*2;
+    GAMES.work.renderWK();
+  },
+  renderWK(){
+    const t1=gameState.wkT1,t2=gameState.wkT2;
+    const together=Math.round(t1*t2/(t1+t2)*10)/10;
+    const c=document.getElementById('stageContent');
+    c.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整工作时间，观察合作效率</p>'+
+      '<div class="slider-grp"><label>甲单独做(天)</label><span class="slider-val" id="wkT1V">'+t1+'</span><input type="range" id="wkT1S" min="3" max="20" value="'+t1+'" oninput="GAMES.work.upd()"></div>'+
+      '<div class="slider-grp"><label>乙单独做(天)</label><span class="slider-val" id="wkT2V">'+t2+'</span><input type="range" id="wkT2S" min="3" max="30" value="'+t2+'" oninput="GAMES.work.upd()"></div>'+
+      '<p style="text-align:center;font-size:16px">甲每天做 <b style="color:#ff6b6b">1/'+t1+'</b>，乙每天做 <b style="color:#4ecdc4">1/'+t2+'</b></p>'+
+      '<p style="text-align:center;font-size:18px">合作完成需 <b style="color:#f59f00">'+together+'</b> 天</p>'+
+      '<p style="font-size:12px;color:#adb5bd;text-align:center">1÷(1/'+t1+'+1/'+t2+')='+together+'</p>';
+  },
+  upd(){
+    gameState.wkT1=parseInt(document.getElementById('wkT1S').value);
+    gameState.wkT2=parseInt(document.getElementById('wkT2S').value);
+    document.getElementById('wkT1V').textContent=gameState.wkT1;
+    document.getElementById('wkT2V').textContent=gameState.wkT2;
+    GAMES.work.renderWK();
+  },
+  stage3(container){
+    const probs=[{t1:6,t2:12,ans:4},{t1:10,t2:15,ans:6},{t1:12,t2:6,ans:4},{t1:20,t2:30,ans:12},{t1:18,t2:9,ans:6},{t1:24,t2:8,ans:6},{t1:15,t2:10,ans:6},{t1:20,t2:5,ans:4},{t1:12,t2:4,ans:3}];
+    const p=probs[Math.floor(Math.random()*probs.length)];
+    gameState.wkAns=p.ans;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">甲单独做需'+p.t1+'天，乙单独做需'+p.t2+'天，两人合作需几天？</p>'+
+      '<div class="answer-row"><span>合作</span><input class="answer-input" id="wkAns"><span>天</span><button class="btn btn-p" onclick="GAMES.work.check()">确认</button></div>'+
+      '<p class="feedback" id="wkfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const ans=parseInt(document.getElementById('wkAns').value),fb=document.getElementById('wkfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.wkAns){fb.textContent='✅ 正确！合作时间='+gameState.wkAns+'天';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err'}
+  }
+};
+
+// ==================== GAME 24: 流水行船 ====================
+GAMES.boatcurrent = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:15px;line-height:2">⛵ <b>流水行船</b><br><br>船在静水中速度 <b>v</b>，水流速度 <b>c</b><br><br>顺水速度 = v + c（水推船）<br>逆水速度 = v - c（水挡船）<br><br>例：v=20km/h, c=5km/h<br>顺水：20+5=<b>25km/h</b><br>逆水：20-5=<b>15km/h</b><br><br>📌 船速=(顺+逆)÷2，水速=(顺-逆)÷2</p>';
+  },
+  stage2(container){
+    gameState.bcV=genRandInt(12,25);gameState.bcC=genRandInt(2,Math.floor(gameState.bcV/3));
+    GAMES.boatcurrent.renderBC();
+  },
+  renderBC(){
+    const v=gameState.bcV,c=gameState.bcC,down=v+c,up=v-c;
+    const container=document.getElementById('stageContent');
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整船速和水速</p>'+
+      '<div class="slider-grp"><label>船速(km/h)</label><span class="slider-val" id="bcVV">'+v+'</span><input type="range" id="bcVS" min="10" max="30" value="'+v+'" oninput="GAMES.boatcurrent.upd()"></div>'+
+      '<div class="slider-grp"><label>水速(km/h)</label><span class="slider-val" id="bcCV">'+c+'</span><input type="range" id="bcCS" min="1" max="8" value="'+c+'" oninput="GAMES.boatcurrent.upd()"></div>'+
+      '<p style="text-align:center;font-size:18px">顺水速度 = <b style="color:#ff6b6b">'+down+'</b> km/h &nbsp;|&nbsp; 逆水速度 = <b style="color:#4ecdc4">'+up+'</b> km/h</p>'+
+      '<p style="font-size:12px;color:#adb5bd;text-align:center">船速=('+down+'+'+up+')÷2='+v+' &nbsp; 水速=('+down+'-'+up+')÷2='+c+'</p>';
+  },
+  upd(){
+    gameState.bcV=parseInt(document.getElementById('bcVS').value);
+    gameState.bcC=parseInt(document.getElementById('bcCS').value);
+    if(gameState.bcC>=gameState.bcV) gameState.bcC=Math.max(1,gameState.bcV-2);
+    document.getElementById('bcVV').textContent=gameState.bcV;
+    document.getElementById('bcCV').textContent=gameState.bcC;
+    document.getElementById('bcCS').value=gameState.bcC;
+    GAMES.boatcurrent.renderBC();
+  },
+  stage3(container){
+    // Type 1: given v,c, find down/up speed; Type 2: given down/up, find v,c
+    const type=Math.random();
+    if(type<0.5){
+      const v=genRandInt(12,25),c=genRandInt(2,Math.min(8,Math.floor(v/3)));
+      const down=v+c,up=v-c;gameState.bcAns3=v;gameState.bcQ=
+        '一艘船在静水中速度'+v+'km/h，水流速度'+c+'km/h。顺水速度和逆水速度各是多少？'+'<br><small style="color:#adb5bd">顺水:</small>';
+      gameState.bcDown=down;gameState.bcUp=up;gameState.bcMode='two';gameState.bcVAns=v;gameState.bcCAns=c;
+    }else{
+      // 顺水速度a, 逆水速度b, both same parity → v=(a+b)/2, c=(a-b)/2
+      const v=genRandInt(12,22),c=genRandInt(2,Math.min(6,Math.floor(v/4)));
+      const down=v+c,up=v-c;
+      gameState.bcAns3=v;gameState.bcVAns=v;gameState.bcCAns=c;
+      gameState.bcQ='一条河，顺水速度'+down+'km/h，逆水速度'+up+'km/h。船速和水速各是多少？'+'<br><small style="color:#adb5bd">船速:</small>';
+      gameState.bcDown=down;gameState.bcUp=up;gameState.bcMode='two2';
+    }
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">'+gameState.bcQ+'</p>'+
+      '<div class="answer-row"><input class="answer-input" id="bcAns1" placeholder="顺水/船速">'+
+      (gameState.bcMode.startsWith('two')?'<input class="answer-input" id="bcAns2" placeholder="逆水/水速">':'')+
+      '<button class="btn btn-p" onclick="GAMES.boatcurrent.check3()">确认</button></div>'+
+      '<p class="feedback" id="bcfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check3(){
+    const fb=document.getElementById('bcfb');
+    if(gameState.bcMode==='two'){
+      const a1=parseInt(document.getElementById('bcAns1').value),a2=parseInt(document.getElementById('bcAns2').value);
+      if(isNaN(a1)||isNaN(a2)){fb.textContent='请填写完整';return}
+      if(a1===gameState.bcDown&&a2===gameState.bcUp){fb.textContent='✅ 正确！顺水=v+c='+gameState.bcDown+'，逆水=v-c='+gameState.bcUp;fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal()}
+      else{fb.textContent='❌ 顺水=v+c，逆水=v-c';fb.className='feedback err'}
+    }else{
+      const a1=parseInt(document.getElementById('bcAns1').value),a2=parseInt(document.getElementById('bcAns2').value);
+      if(isNaN(a1)||isNaN(a2)){fb.textContent='请填写完整';return}
+      if(a1===gameState.bcVAns&&a2===gameState.bcCAns){fb.textContent='✅ 正确！船速=('+gameState.bcDown+'+'+gameState.bcUp+')÷2='+gameState.bcVAns+'，水速=('+gameState.bcDown+'-'+gameState.bcUp+')÷2='+gameState.bcCAns;fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal()}
+      else{fb.textContent='❌ 船速=(顺+逆)÷2，水速=(顺-逆)÷2';fb.className='feedback err'}
+    }
+  }
+};
+
+// ==================== GAME 25: 牛吃草问题 ====================
+GAMES.cowgrass = {
+  stage1(container){
+    container.innerHTML='<p style="text-align:center;font-size:14px;line-height:1.9">🐄 <b>牛吃草问题</b>（牛顿问题）<br><br>草地每天匀速长草，牛每天吃固定量的草<br><br>例：<b>8头牛10天</b>吃完，<b>11头牛5天</b>吃完<br><br>每天长草量：(8×10-11×5)÷(10-5)=<b>5份</b><br>原有草量：8×10-5×10=<b>30份</b><br><br>问：<b>7头牛</b>吃几天？<br>30÷(7-5)=<b>15天</b> ✅<br><br>📌 先求<b>每天长草量</b>，再求<b>原有草量</b></p>';
+  },
+  stage2(container){
+    gameState.cgN1=8;gameState.cgT1=10;gameState.cgN2=11;gameState.cgT2=5;
+    gameState.cgG=(gameState.cgN1*gameState.cgT1-gameState.cgN2*gameState.cgT2)/(gameState.cgT1-gameState.cgT2);
+    gameState.cgS=gameState.cgN1*gameState.cgT1-gameState.cgG*gameState.cgT1;
+    GAMES.cowgrass.renderCG();
+  },
+  renderCG(){
+    const n1=gameState.cgN1,t1=gameState.cgT1,n2=gameState.cgN2,t2=gameState.cgT2;
+    const g=(n1*t1-n2*t2)/(t1-t2),s=n1*t1-g*t1;
+    let extra='';
+    if(g>0&&s>0){
+      const n3=genRandInt(Math.ceil(g)+1,Math.ceil(g)+8);
+      const t3=Math.round(s/(n3-g)*10)/10;
+      extra='<p style="text-align:center;font-size:14px;color:#636e72">若 '+n3+' 头牛 → '+s.toFixed(0)+'÷('+n3+'-'+g.toFixed(1)+') ≈ <b>'+t3+'</b> 天</p>';
+    }else{
+      extra='<p style="text-align:center;font-size:13px;color:#ff6b6b">⚠️ 请确保方案1的总草量大于方案2（更多牛吃更短时间）</p>';
+    }
+    const c=document.getElementById('stageContent');
+    c.innerHTML=
+      '<p style="text-align:center;font-weight:700">调整牛数和天数，观察变化</p>'+
+      '<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">'+
+      '<div class="slider-grp" style="max-width:160px"><label>方案1: 牛数</label><span class="slider-val" id="cgN1V">'+n1+'</span><input type="range" id="cgN1S" min="3" max="15" value="'+n1+'" oninput="GAMES.cowgrass.upd()"></div>'+
+      '<div class="slider-grp" style="max-width:160px"><label>方案1: 天数</label><span class="slider-val" id="cgT1V">'+t1+'</span><input type="range" id="cgT1S" min="4" max="15" value="'+t1+'" oninput="GAMES.cowgrass.upd()"></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">'+
+      '<div class="slider-grp" style="max-width:160px"><label>方案2: 牛数</label><span class="slider-val" id="cgN2V">'+n2+'</span><input type="range" id="cgN2S" min="2" max="20" value="'+n2+'" oninput="GAMES.cowgrass.upd()"></div>'+
+      '<div class="slider-grp" style="max-width:160px"><label>方案2: 天数</label><span class="slider-val" id="cgT2V">'+t2+'</span><input type="range" id="cgT2S" min="2" max="10" value="'+t2+'" oninput="GAMES.cowgrass.upd()"></div>'+
+      '</div>'+
+      '<p style="text-align:center;font-size:14px">每天长草: <b style="color:#ff6b6b">'+g.toFixed(1)+'</b> 份 | 原有草: <b style="color:#4ecdc4">'+s.toFixed(1)+'</b> 份</p>'+extra;
+  },
+  upd(){
+    gameState.cgN1=parseInt(document.getElementById('cgN1S').value);
+    gameState.cgT1=parseInt(document.getElementById('cgT1S').value);
+    gameState.cgN2=parseInt(document.getElementById('cgN2S').value);
+    gameState.cgT2=parseInt(document.getElementById('cgT2S').value);
+    if(gameState.cgT1<=gameState.cgT2) gameState.cgT2=gameState.cgT1-1;
+    document.getElementById('cgN1V').textContent=gameState.cgN1;
+    document.getElementById('cgT1V').textContent=gameState.cgT1;
+    document.getElementById('cgN2V').textContent=gameState.cgN2;
+    document.getElementById('cgT2V').textContent=gameState.cgT2;
+    document.getElementById('cgT2S').value=gameState.cgT2;
+    GAMES.cowgrass.renderCG();
+  },
+  stage3(container){
+    // Pre-verified combos: N1,T1,N2,T2,G,S,N3,Ans
+    const probs=[
+      {n1:6,t1:10,n2:8,t2:5,g:4,s:20,n3:9,ans:4,qn3:9},      // 20/(9-4)=4
+      {n1:7,t1:8,n2:11,t2:4,g:3,s:32,n3:11,ans:4,qn3:11},     // 32/(11-3)=4
+      {n1:7,t1:10,n2:11,t2:6,g:1,s:60,n3:13,ans:5,qn3:13},    // 60/(13-1)=5
+      {n1:8,t1:10,n2:12,t2:6,g:2,s:60,n3:14,ans:5,qn3:14},    // 60/(14-2)=5
+      {n1:6,t1:10,n2:8,t2:5,g:4,s:20,n3:14,ans:2,qn3:14},     // 20/(14-4)=2
+      {n1:6,t1:10,n2:8,t2:5,g:4,s:20,n3:8,ans:5,qn3:8},       // 20/(8-4)=5
+      {n1:7,t1:8,n2:11,t2:4,g:3,s:32,n3:7,ans:8,qn3:7},       // 32/(7-3)=8
+      {n1:7,t1:10,n2:11,t2:6,g:1,s:60,n3:7,ans:10,qn3:7},     // 60/(7-1)=10
+    ];
+    const p=probs[Math.floor(Math.random()*probs.length)];
+    gameState.cgAns=p.ans;
+    container.innerHTML=
+      '<p style="text-align:center;font-weight:700">一片草地每天匀速长草。'+p.n1+'头牛'+p.t1+'天吃完，'+p.n2+'头牛'+p.t2+'天吃完。'+p.qn3+'头牛几天吃完？</p>'+
+      '<div class="answer-row"><span>需要</span><input class="answer-input" id="cgAns"><span>天</span><button class="btn btn-p" onclick="GAMES.cowgrass.check()">确认</button></div>'+
+      '<p class="feedback" id="cgfb"></p><button class="btn btn-o" onclick="renderGameStage()">🔄 换一题</button>';
+  },
+  check(){
+    const ans=parseInt(document.getElementById('cgAns').value),fb=document.getElementById('cgfb');
+    if(isNaN(ans)){fb.textContent='请输入数字';return}
+    if(ans===gameState.cgAns){fb.textContent='✅ 正确！先求每天长草量和原有草量';fb.className='feedback ok';setStars('cowgrass',3);celebrate();updateStarTotal()}
+    else{fb.textContent='❌ 先算每天长草量=(N₁T₁-N₂T₂)÷(T₁-T₂)，再算原有草量';fb.className='feedback err'}
+  }
+};
+
+// ==================== Init ====================
+function init(){
+  renderMenu();
+  updateStarTotal();
+}
+init();
+</script>
+</body>
+</html>
