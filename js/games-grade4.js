@@ -124,8 +124,8 @@ GAMES.chickenrabbit = {
   check3: function(){
     var c=parseInt(document.getElementById('crAC').value),r=parseInt(document.getElementById('crAR').value),fb=document.getElementById('crfb3');
     if(isNaN(c)||isNaN(r)){fb.textContent='请填写完整';return}
-    if(c===gameState.crAnsC&&r===gameState.crAnsR){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('chickenrabbit',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 用假设法：先假设全是鸡，再替换';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(c===gameState.crAnsC&&r===gameState.crAnsR){awardStage3('chickenrabbit',document.getElementById('stageContent'),'✅ 全对！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 用假设法：先假设全是鸡，再替换');}
   }
 };
 
@@ -262,8 +262,8 @@ GAMES.pigeonhole = {
   check3: function(){
     var ans=parseInt(document.getElementById('phAns3').value),fb=document.getElementById('phfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.phAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('pigeonhole',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 考虑最坏情况：平均分配后向上取整';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.phAns3){awardStage3('pigeonhole',document.getElementById('stageContent'),'✅ 正确！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 考虑最坏情况：平均分配后向上取整');}
   }
 };
 
@@ -444,8 +444,8 @@ GAMES.meeting = {
   check3: function(){
     var ans=parseFloat(document.getElementById('mtAns3').value),fb=document.getElementById('mtfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.mtAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度和';fb.className='feedback ok';setStars('meeting',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 公式：距离÷(速度A+速度B)';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(checkAnswer(ans,gameState.mtAns3,0.15)){awardStage3('meeting',document.getElementById('stageContent'),'✅ 正确！时间=距离÷速度和');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 公式：距离÷(速度A+速度B)');}
   }
 };
 
@@ -502,8 +502,8 @@ GAMES.chase = {
   check3: function(){
     var ans=parseFloat(document.getElementById('chAns3').value),fb=document.getElementById('chfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.chAns3)<0.15){fb.textContent='✅ 正确！时间=距离÷速度差';fb.className='feedback ok';setStars('chase',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 公式：领先距离÷(快-慢)';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(checkAnswer(ans,gameState.chAns3,0.15)){awardStage3('chase',document.getElementById('stageContent'),'✅ 正确！时间=距离÷速度差');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 公式：领先距离÷(快-慢)');}
   }
 };
 

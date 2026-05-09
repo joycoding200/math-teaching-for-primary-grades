@@ -205,8 +205,8 @@ GAMES.balance = {
   check3: function(){
     var ans=parseInt(document.getElementById('blAns').value),fb=document.getElementById('blfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.blAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('balance',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 移动数=(多出的)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.blAns3){awardStage3('balance',document.getElementById('stageContent'),'✅ 正确！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 移动数=(多出的)÷2');}
   }
 };
 
@@ -365,8 +365,8 @@ GAMES.queue = {
   check3: function(){
     var ans=parseInt(document.getElementById('qAns3').value),fb=document.getElementById('qfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.qAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('queue',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 再想想公式：左数+右数-1';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.qAns3){awardStage3('queue',document.getElementById('stageContent'),'✅ 正确！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 再想想公式：左数+右数-1');}
   }
 };
 

@@ -49,8 +49,8 @@ GAMES.summulti = {
   check3: function(){
     var a=parseInt(document.getElementById('smA').value),b=parseInt(document.getElementById('smB').value),fb=document.getElementById('smfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.smAnsA&&b===gameState.smAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('summulti',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 小数=和÷(倍数+1)';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(a===gameState.smAnsA&&b===gameState.smAnsB){awardStage3('summulti',document.getElementById('stageContent'),'✅ 全对！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 小数=和÷(倍数+1)');}
   }
 };
 
@@ -103,8 +103,8 @@ GAMES.diffmulti = {
   check3: function(){
     var a=parseInt(document.getElementById('dmA').value),b=parseInt(document.getElementById('dmB').value),fb=document.getElementById('dmfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.dmAnsA&&b===gameState.dmAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('diffmulti',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 小数=差÷(倍数-1)';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(a===gameState.dmAnsA&&b===gameState.dmAnsB){awardStage3('diffmulti',document.getElementById('stageContent'),'✅ 全对！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 小数=差÷(倍数-1)');}
   }
 };
 
@@ -175,13 +175,13 @@ GAMES.age = {
     if(gameState.ageMode==='two'){
       var k=parseInt(document.getElementById('ageK').value),d=parseInt(document.getElementById('ageD').value);
       if(isNaN(k)||isNaN(d)){fb.textContent='请填写完整';return}
-      if(k===gameState.ageAnsK&&d===gameState.ageAnsD){fb.textContent='✅ 全对！年龄差不变，用差倍公式';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 年龄差不变，用差倍公式';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(k===gameState.ageAnsK&&d===gameState.ageAnsD){awardStage3('age',document.getElementById('stageContent'),'✅ 全对！年龄差不变，用差倍公式');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 年龄差不变，用差倍公式');}
     }else{
       var ans=parseInt(document.getElementById('ageAns').value);
       if(isNaN(ans)){fb.textContent='请输入数字';return}
-      if(ans===gameState.ageAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('age',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 年龄差不变，找对倍数关系';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(ans===gameState.ageAns3){awardStage3('age',document.getElementById('stageContent'),'✅ 正确！');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 年龄差不变，找对倍数关系');}
     }
   }
 };
@@ -235,8 +235,8 @@ GAMES.profitloss = {
   check3: function(){
     var ans=parseInt(document.getElementById('plAns3').value),fb=document.getElementById('plfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.plAns3){fb.textContent='✅ 正确！人数=(盈+亏)÷分法差';fb.className='feedback ok';setStars('profitloss',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 公式：(盈+亏)÷(分法之差)';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.plAns3){awardStage3('profitloss',document.getElementById('stageContent'),'✅ 正确！人数=(盈+亏)÷分法差');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 公式：(盈+亏)÷(分法之差)');}
   }
 };
 
@@ -299,8 +299,8 @@ GAMES.reverse = {
   check3: function(){
     var ans=parseInt(document.getElementById('rvAns3').value),fb=document.getElementById('rvfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.rvAns3){fb.textContent='✅ 正确！从结果倒推还原';fb.className='feedback ok';setStars('reverse',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 从结果倒推：运算相反，顺序倒过来';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.rvAns3){awardStage3('reverse',document.getElementById('stageContent'),'✅ 正确！从结果倒推还原');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 从结果倒推：运算相反，顺序倒过来');}
   }
 };
 
@@ -359,8 +359,8 @@ GAMES.average = {
   check3: function(){
     var ans=parseFloat(document.getElementById('avAns3').value),fb=document.getElementById('avfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.avAns3)<0.1){fb.textContent='✅ 正确！平均='+gameState.avAns3;fb.className='feedback ok';setStars('average',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ (总和)÷个数';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(Math.abs(ans-gameState.avAns3)<0.1){awardStage3('average',document.getElementById('stageContent'),'✅ 正确！平均='+gameState.avAns3);}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ (总和)÷个数');}
   }
 };
 

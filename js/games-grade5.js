@@ -56,11 +56,11 @@ GAMES.work = {
     var ans=parseFloat(document.getElementById('wkAns3').value),fb=document.getElementById('wkfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
     if(typeof gameState.wkAns3==='number'){
-      if(Math.abs(ans-gameState.wkAns3)<0.15){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(checkAnswer(ans,gameState.wkAns3,0.15)){awardStage3('work',document.getElementById('stageContent'),'✅ 正确！');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 公式：1÷(1/T₁+1/T₂)');}
     }else{
-      if(String(ans)===String(gameState.wkAns3)){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('work',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 公式：1÷(1/T₁+1/T₂)';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(String(ans)===String(gameState.wkAns3)){awardStage3('work',document.getElementById('stageContent'),'✅ 正确！');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 公式：1÷(1/T₁+1/T₂)');}
     }
   }
 };
@@ -133,13 +133,13 @@ GAMES.boatcurrent = {
     if(gameState.bcMode==='two'){
       var a1=document.getElementById('bcAns1').value,a2=document.getElementById('bcAns2').value;
       if(!a1||!a2){fb.textContent='请填写完整';return}
-      if(a1===gameState.bcAns1&&a2===gameState.bcAns2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 顺水=v+c，逆水=v-c（或船速=(顺+逆)÷2）';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(a1===gameState.bcAns1&&a2===gameState.bcAns2){awardStage3('boatcurrent',document.getElementById('stageContent'),'✅ 正确！');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 顺水=v+c，逆水=v-c（或船速=(顺+逆)÷2）');}
     }else{
       var ans=parseFloat(document.getElementById('bcAns1').value);
       if(isNaN(ans)){fb.textContent='请输入数字';return}
-      if(Math.abs(ans-parseFloat(gameState.bcAns1))<0.2){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('boatcurrent',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-      else{fb.textContent='❌ 再算算：顺水=v+c，逆水=v-c';fb.className='feedback err';awardResult(currentGame,false,0);}
+      if(checkAnswer(ans,gameState.bcAns1,0.15)){awardStage3('boatcurrent',document.getElementById('stageContent'),'✅ 正确！');}
+      else{penalizeStage3(document.getElementById('stageContent'),'❌ 再算算：顺水=v+c，逆水=v-c');}
     }
   }
 };
@@ -217,8 +217,8 @@ GAMES.cowgrass = {
   check3: function(){
     var ans=parseFloat(document.getElementById('cgAns3').value),fb=document.getElementById('cgfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(Math.abs(ans-gameState.cgAns3)<0.15){fb.textContent='✅ 正确！先求每天长草量和原有草量';fb.className='feedback ok';setStars('cowgrass',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 先算每天长草量=(N₁T₁-N₂T₂)÷(T₁-T₂)，再算原有草量';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(checkAnswer(ans,gameState.cgAns3,0.15)){awardStage3('cowgrass',document.getElementById('stageContent'),'✅ 正确！先求每天长草量和原有草量');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 先算每天长草量=(N₁T₁-N₂T₂)÷(T₁-T₂)，再算原有草量');}
   }
 };
 

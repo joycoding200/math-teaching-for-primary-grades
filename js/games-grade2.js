@@ -62,8 +62,8 @@ GAMES.substitution = {
   check: function(){
     var ans=parseInt(document.getElementById('subAns').value),fb=document.getElementById('subfb');
     if(isNaN(ans)){fb.textContent='请输入数字哦～';return}
-    if(ans===gameState.subAns){fb.textContent='✅ 太棒了！';fb.className='feedback ok';setStars('substitution',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 再想想哦～';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.subAns){awardStage3('substitution',document.getElementById('stageContent'),'✅ 太棒了！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 再想想哦～');}
   }
 };
 
@@ -224,8 +224,8 @@ GAMES.tree = {
   check3: function(){
     var ans=parseInt(document.getElementById('trAns3').value),fb=document.getElementById('trfb3');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.trAns3){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('tree',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 先算段数，再根据种植方式确定树数';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.trAns3){awardStage3('tree',document.getElementById('stageContent'),'✅ 正确！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 先算段数，再根据种植方式确定树数');}
   }
 };
 
@@ -276,8 +276,8 @@ GAMES.normalization = {
   check: function(){
     var ans=parseInt(document.getElementById('nmAns').value),fb=document.getElementById('nmfb');
     if(isNaN(ans)){fb.textContent='请输入数字';return}
-    if(ans===gameState.nmAns){fb.textContent='✅ 正确！';fb.className='feedback ok';setStars('normalization',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else{fb.textContent='❌ 先求1份的量（归一），再求多份';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(ans===gameState.nmAns){awardStage3('normalization',document.getElementById('stageContent'),'✅ 正确！');}
+    else{penalizeStage3(document.getElementById('stageContent'),'❌ 先求1份的量（归一），再求多份');}
   }
 };
 
@@ -331,9 +331,9 @@ GAMES.sumdiff = {
   check3: function(){
     var a=parseInt(document.getElementById('sdA').value),b=parseInt(document.getElementById('sdB').value),fb=document.getElementById('sdfb');
     if(isNaN(a)||isNaN(b)){fb.textContent='请填写完整';return}
-    if(a===gameState.sdAnsA&&b===gameState.sdAnsB){fb.textContent='✅ 全对！';fb.className='feedback ok';setStars('sumdiff',3);celebrate();updateStarTotal();awardResult(currentGame,true,0);}
-    else if(a===gameState.sdAnsA){fb.textContent='大数对了！小数=(和-差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
-    else if(b===gameState.sdAnsB){fb.textContent='小数对了！大数=(和+差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
-    else{fb.textContent='再想想公式：(和±差)÷2';fb.className='feedback err';awardResult(currentGame,false,0);}
+    if(a===gameState.sdAnsA&&b===gameState.sdAnsB){awardStage3('sumdiff',document.getElementById('stageContent'),'✅ 全对！');}
+    else if(a===gameState.sdAnsA){penalizeStage3(document.getElementById('stageContent'),'大数对了！小数=(和-差)÷2');}
+    else if(b===gameState.sdAnsB){penalizeStage3(document.getElementById('stageContent'),'小数对了！大数=(和+差)÷2');}
+    else{penalizeStage3(document.getElementById('stageContent'),'再想想公式：(和±差)÷2');}
   }
 };
