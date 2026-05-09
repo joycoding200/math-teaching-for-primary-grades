@@ -34,6 +34,35 @@ var TOPICS = [
   {id:'cowgrass',icon:'🐄',name:'牛吃草',cat:'五年级',g:'cowgrass'}
 ];
 
+// ── 教材来源映射 ──
+var SOURCES = {
+  pattern:        '人教版一年级上册第七单元《找规律》',
+  countshape:     '人教版一年级下册第一单元《认识图形（二）》',
+  balance:        '人教版二年级上册第二单元《100以内的加法和减法（二）》',
+  simplelogic:    '人教版二年级下册第九单元《数学广角——推理》',
+  queue:          '人教版一年级上册第六单元《11～20各数的认识》',
+  substitution:   '人教版二年级下册《数学广角——等量代换》',
+  cycle:          '人教版二年级下册《有余数的除法》周期问题',
+  tree:           '人教版四年级下册第九单元《数学广角——植树问题》',
+  normalization:  '人教版三年级上册第六单元《多位数乘一位数》归一问题',
+  sumdiff:        '人教版四年级下册第一单元《四则运算》和差问题',
+  summulti:       '人教版三年级下册《两位数乘两位数》和倍问题',
+  diffmulti:      '人教版三年级下册《两位数乘两位数》差倍问题',
+  age:            '人教版三年级下册《年、月、日》年龄问题',
+  profitloss:     '人教版四年级上册第六单元《除数是两位数的除法》盈亏问题',
+  reverse:        '人教版四年级下册第一单元《四则运算》还原问题',
+  average:        '人教版四年级下册第八单元《平均数与条形统计图》',
+  chickenrabbit:  '《孙子算经》经典题·人教版四年级下册第九单元《数学广角——鸡兔同笼》',
+  venn:           '人教版三年级上册第九单元《数学广角——集合》容斥原理',
+  pigeonhole:     '人教版六年级下册第五单元《数学广角——鸽巢问题》',
+  logic:          '人教版四年级下册第九单元《数学广角——逻辑推理》',
+  meeting:        '人教版四年级上册第三单元《三位数乘两位数》行程问题',
+  chase:          '人教版四年级上册第三单元《三位数乘两位数》追及问题',
+  work:           '人教版五年级上册第六单元《多边形的面积》工程问题',
+  boatcurrent:    '人教版五年级上册第一单元《小数乘法》流水行船',
+  cowgrass:       '人教版六年级上册《数学广角——牛吃草问题》'
+};
+
 // ── 全局状态 ──
 var GAMES = {};
 var currentGame = null;
@@ -286,11 +315,22 @@ function renderGameStage(){
   var fn=g['stage'+gameStage];
   if(fn) fn(container);
   else{ container.innerHTML='<p style="padding:40px;text-align:center;color:#adb5bd">⏳ 加载中…</p>'; return; }
-  // Stage 1 教学动画
-  if(gameStage===1) animateStage1(container);
-  // 练一练模式：注入计时开关和难度标签
+  // Stage 1 教学动画 + 教材来源标注
+  if(gameStage===1){
+    animateStage1(container);
+    var src=SOURCES[currentGame];
+    if(src){
+      var srcEl=document.createElement('div');
+      srcEl.className='textbook-source';
+      srcEl.textContent='📖 '+src;
+      container.appendChild(srcEl);
+    }
+  }
+  // 练一练模式：注入计时开关、难度标签、进度追踪
   if(gameStage===3){
     resetHints();
+    if(!gameState._stage3Correct) gameState._stage3Correct=0;
+    if(!gameState._stage3Total) gameState._stage3Total=0;
     injectStage3Extras(container);
   }
 }
@@ -298,8 +338,9 @@ function renderGameStage(){
 function injectStage3Extras(container){
   var diff=getCurrentDifficulty();
   var timeLimit=getDifficultyTime(diff);
-  // 难度标签 + 计时开关 + 提示按钮
   var diffLabel={easy:'🟢 基础',medium:'🟡 进阶',hard:'🔴 挑战'}[diff];
+  var correct=gameState._stage3Correct||0, total=gameState._stage3Total||0;
+  var pct=total>0?Math.round(correct/total*100):0;
   var extrasHtml='<div style="display:flex;gap:8px;align-items:center;justify-content:center;width:100%;flex-wrap:wrap;margin-bottom:4px">'+
     '<span class="diff-badge '+diff+'">'+diffLabel+'</span>'+
     '<label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none">'+
@@ -310,10 +351,44 @@ function injectStage3Extras(container){
     '</div>'+
     '<div class="timer-wrap" id="timerWrap" style="display:'+(timedMode?'flex':'none')+'">'+
     '<span>⏱</span><div class="timer-bar-track"><div class="timer-bar-fill" id="timerFill" style="width:100%"></div></div>'+
-    '<span class="timer-text" id="timerText">'+timeLimit+'s</span></div>';
+    '<span class="timer-text" id="timerText">'+timeLimit+'s</span></div>'+
+    // 练习进度条
+    '<div style="display:flex;align-items:center;gap:8px;justify-content:center;margin:6px 0 2px">'+
+    '<span style="font-size:12px;color:#868e96">📝 本题正确率：</span>'+
+    '<div style="width:80px;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden">'+
+    '<div id="stage3ProgBar" style="width:'+pct+'%;height:100%;background:'+(pct>=80?'#00b894':pct>=50?'#feca57':'#ff6b6b')+';border-radius:3px;transition:width .3s"></div></div>'+
+    '<span style="font-size:12px;font-weight:700;color:#495057" id="stage3ProgText">'+correct+'/'+total+'</span>'+
+    '</div>';
   container.insertAdjacentHTML('afterbegin',extrasHtml);
   if(timedMode){ startTimedChallenge(timeLimit); }
   updateTimerBest();
+}
+
+// Stage 3 进度更新：每次答题后调用
+function updateStage3Progress(correct){
+  if(!gameState._stage3Total) gameState._stage3Total=0;
+  if(!gameState._stage3Correct) gameState._stage3Correct=0;
+  gameState._stage3Total++;
+  if(correct) gameState._stage3Correct++;
+  var c=gameState._stage3Correct, t=gameState._stage3Total;
+  var pct=t>0?Math.round(c/t*100):0;
+  var bar=document.getElementById('stage3ProgBar');
+  var txt=document.getElementById('stage3ProgText');
+  if(bar){
+    bar.style.width=pct+'%';
+    bar.style.background=pct>=80?'#00b894':pct>=50?'#feca57':'#ff6b6b';
+  }
+  if(txt) txt.textContent=c+'/'+t;
+  // 5题正确 → 额外庆祝
+  if(correct && c>0 && c%5===0){
+    setTimeout(function(){
+      var overlay=document.createElement('div');
+      overlay.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:400;text-align:center;pointer-events:none;animation:celePopIn .4s cubic-bezier(.34,1.56,.64,1),celeFadeOut .4s 2s forwards';
+      overlay.innerHTML='<div style="font-size:48px">🌟</div><div style="font-size:22px;font-weight:900;color:#f59f00;margin-top:4px">本轮已答对 '+c+' 题！</div>';
+      document.body.appendChild(overlay);
+      setTimeout(function(){overlay.remove();},2500);
+    },600);
+  }
 }
 
 function showStageHint(level){
@@ -516,8 +591,9 @@ function makeVennSVG(){
   return '<svg viewBox="0 0 300 160" width="280" height="150"><circle cx="110" cy="80" r="60" fill="rgba(255,107,107,.3)" stroke="#ff6b6b" stroke-width="2"/><circle cx="190" cy="80" r="60" fill="rgba(78,205,196,.3)" stroke="#4ecdc4" stroke-width="2"/><text x="70" y="70" font-size="14" fill="#ff6b6b" font-weight="700">🍎</text><text x="210" y="70" font-size="14" fill="#4ecdc4" font-weight="700">🍌</text><text x="145" y="85" font-size="13" fill="#a29bfe" font-weight="700">都喜欢</text></svg>';
 }
 
-// ── Stage 1 教学动画：步骤逐条揭示 ──
+// ── Stage 1 教学动画：步骤逐条揭示（支持自动 / 点击交互两种模式）──
 function animateStage1(container){
+  var explainBox=container.querySelector('.explain-box');
   var steps=container.querySelectorAll('.explain-box .step');
   var formula=container.querySelector('.formula-box');
   var svg=container.querySelector('.concept-svg');
@@ -525,17 +601,53 @@ function animateStage1(container){
   // SVG 先入场
   if(svg){ svg.classList.add('anim-ready'); }
 
-  // 步骤逐条揭示（Staggered reveal）
+  // 交互模式：data-interactive="true" 时启用点击逐步展示
+  if(explainBox && explainBox.dataset.interactive==='true'){
+    // 隐藏所有步骤和公式
+    steps.forEach(function(s){ s.style.display='none'; });
+    if(formula) formula.style.display='none';
+
+    var stepIdx=0;
+    var btn=document.createElement('button');
+    btn.className='btn btn-p';
+    btn.textContent='下一步 →';
+    btn.style.cssText='display:block;margin:12px auto 0';
+    btn.onclick=function(){
+      if(stepIdx<steps.length){
+        var step=steps[stepIdx];
+        step.style.display='';
+        step.classList.add('anim-reveal');
+        var num=step.querySelector('.step-num');
+        if(num) num.classList.add('anim-pop');
+        var hl=step.querySelector('.highlight');
+        if(hl) hl.classList.add('anim-glow');
+        stepIdx++;
+        if(stepIdx>=steps.length){
+          btn.textContent='显示公式 ✨';
+        }
+      }else{
+        if(formula){
+          formula.style.display='';
+          formula.classList.add('anim-ready');
+        }
+        btn.textContent='已全部展示 ✓';
+        btn.disabled=true;
+        btn.className='btn btn-s';
+      }
+    };
+    explainBox.appendChild(btn);
+    return;
+  }
+
+  // 自动模式：步骤逐条揭示（Staggered reveal）
   steps.forEach(function(step,i){
     setTimeout(function(){
       step.classList.add('anim-reveal');
-      // 步骤数字弹入
       var num=step.querySelector('.step-num');
       if(num){ setTimeout(function(){num.classList.add('anim-pop');},200); }
-      // 高亮文字发光
       var hl=step.querySelector('.highlight');
       if(hl){ setTimeout(function(){hl.classList.add('anim-glow');},400); }
-    }, i*350); // 每条步骤间隔 350ms
+    }, i*350);
   });
 
   // 公式框在所有步骤后弹入
@@ -543,6 +655,86 @@ function animateStage1(container){
     var delay=steps.length*350+200;
     setTimeout(function(){ formula.classList.add('anim-ready'); }, delay);
   }
+}
+
+// ═══════════════════════════════════════════
+//  ── Phase 1a: 共享评分辅助函数 ──
+// ═══════════════════════════════════════════
+
+// 显示正确反馈 + 庆祝动画 + 更新星级总数
+function handleCorrect(container, message) {
+  var fb = container.querySelector('.feedback');
+  if (fb) { fb.textContent = message || '✅ 正确！'; fb.className = 'feedback ok'; }
+  celebrate();
+  updateStarTotal();
+}
+
+// 显示错误反馈，不扣分（用于 Stage 2 探索模式）
+function handleWrongExplore(container, message) {
+  var fb = container.querySelector('.feedback');
+  if (fb) { fb.textContent = message || '❌ 再试试'; fb.className = 'feedback err'; }
+}
+
+// 显示错误反馈 + 扣分（用于 Stage 3 练习模式）
+function handleWrongQuiz(container, message) {
+  var fb = container.querySelector('.feedback');
+  if (fb) { fb.textContent = message || '❌ 再试试'; fb.className = 'feedback err'; }
+  awardResult(currentGame, false, 0);
+}
+
+// Stage 2 探索评分：2星 + 探索分 + 庆祝
+function awardStage2(gameId, container, message) {
+  setStars(gameId, 2);
+  awardExplore(gameId);
+  handleCorrect(container, message || '✅ 正确！');
+}
+
+// Stage 3 练习评分：3星 + 正误计分 + 庆祝 + 进度
+function awardStage3(gameId, container, message) {
+  setStars(gameId, 3);
+  awardResult(gameId, true, 0);
+  handleCorrect(container, message || '✅ 正确！');
+  updateStage3Progress(true);
+}
+
+// Stage 3 错误评分：扣分只扣一次 + 进度
+function penalizeStage3(container, message) {
+  var fb = container.querySelector('.feedback');
+  if (fb) { fb.textContent = message || '❌ 再想想'; fb.className = 'feedback err'; }
+  awardResult(currentGame, false, 0);
+  updateStage3Progress(false);
+}
+
+// ── Phase 1c: 统一答案比较 ──
+function checkAnswer(userAnswer, expectedAnswer, tolerance) {
+  if (userAnswer === null || userAnswer === undefined || userAnswer === '') return false;
+  // 数字类型：整数精确匹配，浮点数容差匹配
+  if (typeof expectedAnswer === 'number') {
+    var ua = parseFloat(userAnswer);
+    if (isNaN(ua)) return false;
+    if (Number.isInteger(expectedAnswer)) return ua === expectedAnswer;
+    return Math.abs(ua - expectedAnswer) < (tolerance || 0.15);
+  }
+  // 字符串：可能是分数（如 '40/9', '2/15'）或是逗号分隔对（如 '5,3'）
+  if (typeof expectedAnswer === 'string') {
+    var s=String(userAnswer).trim();
+    if (s===expectedAnswer.trim()) return true;
+    // 分数匹配：支持用户输入小数，答案为分数
+    if (expectedAnswer.indexOf('/')>-1){
+      var parts=expectedAnswer.split('/');
+      var fracVal=parseFloat(parts[0])/parseFloat(parts[1]);
+      var uf=parseFloat(userAnswer);
+      if(!isNaN(uf)) return Math.abs(uf-fracVal)<(tolerance||0.15);
+    }
+    return false;
+  }
+  // 对象：用于 simplelogic 等推理题
+  if (typeof expectedAnswer === 'object' && !Array.isArray(expectedAnswer)) {
+    return Object.keys(expectedAnswer).every(function(k){
+      return userAnswer[k] === expectedAnswer[k];
+    });
+  }
+  return String(userAnswer).trim() === String(expectedAnswer).trim();
 }
 
 // ── 初始化 ──
